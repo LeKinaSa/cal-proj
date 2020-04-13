@@ -1,4 +1,4 @@
-# CAL - Project 1
+# CAL - Project
 First project of the Design and Analysis of Algorithms curricular unit.
 
 ## Code Style
