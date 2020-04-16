@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
-\title{On the topic of prize collecting tour construction (working title)}
+\title{Exact and heuristic approaches to prize collecting tour construction (working title)}
 
 \author{Clara Martins, Daniel Monteiro, Gonçalo Pascoal, Rosaldo Rossetti}
 \date{April 2020}
@@ -18,11 +18,15 @@ document. A brief introduction about the main subject.
 \section{Introduction}
 
 \subsection{Case study: A sightseeing tour planning app}
-
+% A apresentação do problema
 We were presented with the following problem: blabla tourist app. 
 
 Given the maximum time to do the tour a start and a destination, we wish to find the best touristic tour that contains the biggest ammount of attractions suitable to the user.
 
 The the tours and the kinds of attractions visited may vary according to the user's preferences, the amount of available time and the kind of transportation used. The visited attractions ought to match the user's preferences.
+
+\section{Reduction to a graph problem}
+
+A street map with all the attractions can be converted to a weighted directed acyclic graph. The attractions can then be a subset of the graph's nodes with a specific prize assigned to each of them. This prize would depend on the user's preferences (for example, if a user wishes to prioritise historical landmarks, their respective nodes's prizes may be inflated). The start and finish are also nodes in the graph. 
 
 \end{document}
