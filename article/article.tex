@@ -21,17 +21,36 @@ document. A brief introduction about the main subject.
 % A apresentação do problema
 We were presented with the following problem: blabla tourist app. 
 
-Given the maximum time to do the tour a start and a destination, we wish to find the best touristic tour that contains the biggest ammount of attractions suitable to the user.
+Given the maximum time to do the tour a start and a destination, we wish to find the best touristic tour that contains the biggest ammount of points of interest suitable to the user.
 
-The the tours and the kinds of attractions visited may vary according to the user's preferences, the amount of available time and the kind of transportation used. The visited attractions ought to match the user's preferences.
+The the tours and the kinds of points of interest visited may vary according to the user's preferences, the amount of available time and the kind of transportation used. The visited points of interest ought to match the user's preferences.
 
 \section{Reduction to a graph problem}
 
-A street map with all the attractions can be converted to a weighted directed acyclic graph. The attractions can then be a subset of the graph's nodes with a specific prize assigned to each of them. This prize would depend on the user's preferences (for example, if a user wishes to prioritise historical landmarks, their respective nodes's prizes may be inflated). The start and finish are also nodes in the graph. 
+A street map with all the points of interest (POIs) can be converted to a weighted directed graph. The POIs can then be a subset of the graph's vertices with a specific prize assigned to each of them. This prize would depend on the user's preferences (for example, if a user wishes to prioritise historical landmarks, their respective vertices's prizes may be inflated). The start and finish are also vertices in the graph. 
 
 \section{Formalization of the problem}
 
-TODO
+Inputs:
+
+\begin{itemize}
+    \item A graph $G = (V, E)$ with non-negative directed edges
+    \item A set of POI vertices $P$ such that $P \subseteq V$
+    \item A function $f$ that maps a POI node $v \in P$ to a score (such that $f(v_{i}) = s_{i}$)
+    \item Start $S$ and finish $F$ vertices such that $S, F \in V$
+    \item A budget $B$
+\end{itemize}
+
+Output:
+
+\begin{itemize}
+    \item A list of of vertices (a path) that maximizes the total score (the sum of the scores of the POI vertices in the list) and verify the following conditions:
+    \begin{enumerate}
+        \item It begins in $S$ and finishes in $F$
+        \item The total cost of the path (sum of the edges' weights) is lower than $B$
+    \end{enumerate} 
+\end{itemize}
+
 
 \section{Overview of the problem}
 
