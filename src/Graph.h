@@ -1,10 +1,15 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include "MutablePriorityQueue.h"
+
 #include <vector>
+#include <limits>
 
 template<class T> class Edge;
 template<class T> class Graph;
+
+constexpr double MAX_DOUBLE = std::numeric_limits<double>::max();
 
 template<class T>
 class Vertex {
@@ -14,6 +19,9 @@ public:
     Vertex<T>* getPath() const;
 
     void addEdge(Vertex<T>* dest, double weight);
+
+    // Required by MutablePriorityQueue
+    bool operator<(const Vertex<T>& vertex) const;
 
     friend class Graph<T>;
 private:
@@ -25,6 +33,9 @@ private:
     // Fields used in Dijkstra's Shortest Path
     double dist = 0;
     Vertex<T>* path = nullptr;
+
+    // Required by MutablePriorityQueue
+    int queueIndex = 0;
 };
 
 template<class T>
@@ -49,6 +60,13 @@ template<class T>
 void Vertex<T>::addEdge(Vertex<T>* dest, double weight) {
     adj.push_back(Edge<T>(dest, weight));
 }
+
+template<class T>
+bool Vertex<T>::operator<(const Vertex<T>& vertex) const {
+    return dist < vertex.dist;
+}
+
+
 
 template<class T>
 class Edge {
@@ -129,7 +147,41 @@ bool Graph<T>::addEdge(const T& source, const T& dest, double weight) {
 
 template<class T>
 void Graph<T>::dijkstraShortestPath(const T& source) {
+    MutablePriorityQueue<Vertex<T>> queue;
 
+    for (Vertex<T>* vertex : vertexSet) {
+        vertex->path = NULL;
+
+        if (vertex->info == source) {
+            vertex->dist = 0;
+            vertex->queueIndex = 0;
+            queue.insert(vertex);
+        }
+        else {
+            vertex->dist = MAX_DOUBLE;
+        }
+    }
+
+    while (!queue.empty()) {
+        Vertex<T>* vertex = queue.extractMin();
+
+        for (const Edge<T>& edge : vertex->adj) {
+            bool notInQueue = edge.dest->dist == MAX_DOUBLE;
+
+            if (edge.dest->dist > vertex->dist + edge.weight) {
+                edge.dest->dist = vertex->dist + edge.weight;
+                edge.dest->path = vertex;
+
+                if (notInQueue) {
+                    edge.dest->queueIndex = edge.dest->dist;
+                    queue.insert(edge.dest);
+                }
+                else {
+                    queue.decreaseKey(edge.dest);
+                }
+            }
+        }
+    }
 }
 
 
