@@ -55,10 +55,23 @@ std::vector<Vertex<T>*> mmpMethod(
         Graph<T>& graph,
         const std::vector<Vertex<T>*>& pointsOfInterest,
         const std::vector<double>& scores,
-        T start,
-        T finish,
+        const T& start,
+        const T& finish,
         double budget
         ) {
+    graph.dijkstraShortestPath(start);
+
+    Vertex<T>* finishPtr = graph.findVertex(finish);
+
+    // Check if there is a solution (a path from start to finish with cost no greater than budget)
+    if (finishPtr != nullptr) {
+        if (finishPtr->getDist() > budget) {
+            return std::vector<Vertex<T>*>();
+        }
+    }
+    else {
+        return std::vector<Vertex<T>*>();
+    }
 
     return std::vector<Vertex<T>*>();
 }
