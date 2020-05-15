@@ -20,10 +20,15 @@ public:
 
     void addEdge(Vertex<T>* dest, double weight);
 
+    bool isPOI(const std::vector<Vertex<T>*>& pointsOfInterest);
+
     // Required by MutablePriorityQueue
     bool operator<(const Vertex<T>& vertex) const;
 
     friend class Graph<T>;
+
+    // Required by MutablePriorityQueue
+    int queueIndex = 0;
 private:
     explicit Vertex(T info);
 
@@ -33,9 +38,6 @@ private:
     // Fields used in Dijkstra's Shortest Path
     double dist = 0;
     Vertex<T>* path = nullptr;
-
-    // Required by MutablePriorityQueue
-    int queueIndex = 0;
 };
 
 template<class T>
@@ -59,6 +61,16 @@ Vertex<T>* Vertex<T>::getPath() const {
 template<class T>
 void Vertex<T>::addEdge(Vertex<T>* dest, double weight) {
     adj.push_back(Edge<T>(dest, weight));
+}
+
+template <class T>
+bool Vertex<T>::isPOI(const std::vector<Vertex<T>*>& pointsOfInterest) {
+    for (Vertex<T> * u : pointsOfInterest) {
+        if (this->getInfo() == u->getInfo()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 template<class T>
@@ -98,6 +110,8 @@ public:
     bool addEdge(const T& source, const T& dest, double weight);
 
     void dijkstraShortestPath(const T& source);
+
+    std::vector<std::vector<double>> generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * origin, Vertex<T> * destination);
 private:
     std::vector<Vertex<T>*> vertexSet;
 };
@@ -184,5 +198,27 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
     }
 }
 
+template <class T>
+std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * origin, Vertex<T> * destination) {
+    std::vector<std::vector<double>> adjacencyMatrix;
+    std::vector<double> aux;
+
+    for (int i = 0; i < vertexSet.size() - 1; ++ i) {
+        if (vertexSet[i]->isPOI(pointsOfInterest) || vertexSet[i] == origin) {
+            dijkstraShortestPath(vertexSet[i]->getInfo());
+            for (int j = 0; j < vertexSet.size() - 1; ++ j) {
+                if (vertexSet[j]->isPOI(pointsOfInterest)) {
+                    aux.push_back(vertexSet[j]->getDist());
+                }
+                if (vertexSet[j] == origin) {
+                    aux.push_back(destination->getDist());
+                }
+            }
+            adjacencyMatrix.push_back(aux);
+            aux.clear();
+        }
+    }
+    return adjacencyMatrix;
+}
 
 #endif // GRAPH_H

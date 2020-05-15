@@ -73,6 +73,9 @@ std::vector<Vertex<T>*> mmpMethod(
         return std::vector<Vertex<T>*>();
     }
 
+    Vertex<T> * startPtr = graph.findVertex(start);
+    graph.generateAdjacencyMatrixWithDijkstra(pointsOfInterest, startPtr, finishPtr);
+
     return std::vector<Vertex<T>*>();
 }
 
@@ -82,6 +85,6 @@ int main() {
     std::vector<double> scores;
 
     initReportGraph(graph, pointsOfInterest, scores);
-
+    mmpMethod(graph, pointsOfInterest, scores, 's', 'f', 1000);
     return 0;
 }
