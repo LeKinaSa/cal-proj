@@ -15,6 +15,7 @@ private:
     vector<int> path;
     vector<int> unusedVertices;
     float pathCost;
+    float score;
 public:
     explicit Vertex(const vector<vector<float>> &adjMatrix)  {
         path.reserve(adjMatrix.size());
@@ -25,23 +26,26 @@ public:
             unusedVertices.push_back(i);
         }
         pathCost = 0;
+        score = 0;
     }
 
-    Vertex(vector<int> path, vector<int> unusedVertices, float pathCost) :
-    path(std::move(path)), unusedVertices(std::move(unusedVertices)), pathCost(pathCost) {}
+    Vertex(vector<int> path, vector<int> unusedVertices, float pathCost, float score) :
+    path(std::move(path)), unusedVertices(std::move(unusedVertices)), pathCost(pathCost), score(score) {}
 
-    bool isAtBottom() {
+    bool isAtBottom() const {
         return unusedVertices.empty();
     }
 
-    vector<Vertex> getValidChildren(const vector<vector<float>> &adjMatrix, const float budget) {
+    vector<Vertex> getValidChildren(const vector<vector<float>> &adjMatrix, const vector<float> &scores, const float budget) const {
         vector<Vertex> res;
         for (int i = 0; i < unusedVertices.size(); i++) {
             int index = unusedVertices[i];
 
-            int last = path.size() - 1;
-            float newCost = budget - adjMatrix[path[last]][0]
-                    + adjMatrix[path[last]][index] + adjMatrix[index][0];
+            int lastPathIndex = path[path.size() - 1];
+            float newCost = pathCost - adjMatrix[lastPathIndex][0]
+                    + adjMatrix[lastPathIndex][index] + adjMatrix[index][0];
+
+            float newScore = score + scores[index];
 
             if (newCost <= budget) {
                 // copying the vectors
@@ -51,15 +55,15 @@ public:
                 newPath.push_back(index);
                 newUnusedVertices.erase(newUnusedVertices.begin() + i);
 
-                res.push_back(Vertex(newPath, newUnusedVertices, newCost));
+                res.push_back(Vertex(newPath, newUnusedVertices, newCost, newScore));
             }
         }
 
         return res;
     }
 
-    bool betterThan(const Vertex &v) {
-        return this->pathCost > v.pathCost;
+    bool betterThan(const Vertex &v) const {
+        return this->score > v.score;
     }
 
     const vector<int> &getPath() const {
@@ -86,7 +90,7 @@ branchAndBound(const vector<vector<float>> &adjMatrix, const vector<float> &scor
             break;
         }
 
-        for (Vertex &child : candidate.getValidChildren(adjMatrix, budget)) {
+        for (Vertex &child : candidate.getValidChildren(adjMatrix, scores, budget)) {
             solutions.push(std::move(child));
         }
     }
