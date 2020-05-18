@@ -198,20 +198,25 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
     }
 }
 
+#include <iostream>
 template <class T>
 std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
     std::vector<std::vector<double>> adjacencyMatrix;
     std::vector<double> aux;
 
-    for (int i = 0; i < pointsOfInterest.size() - 1; ++ i) {
-        dijkstraShortestPath(vertexSet[i]->getInfo());
-        for (int j = 0; j < vertexSet.size() - 1; ++ j) {
-            if (vertexSet[j]->isPOI(pointsOfInterest)) {
-                aux.push_back(vertexSet[j]->getDist());
-            }
-            else if (vertexSet[j] == start) {
-                aux.push_back(finish->getDist());
-            }
+    dijkstraShortestPath(start->getInfo());
+    aux.push_back(finish->getDist());
+    for (int j = 0; j < pointsOfInterest.size(); ++ j) {
+        aux.push_back(pointsOfInterest[j]->getDist());
+    }
+    adjacencyMatrix.push_back(aux);
+    aux.clear();
+
+    for (int i = 0; i < pointsOfInterest.size(); ++ i) {
+        dijkstraShortestPath(pointsOfInterest[i]->getInfo());
+        aux.push_back(finish->getDist());
+        for (int j = 0; j < pointsOfInterest.size(); ++ j) {
+            aux.push_back(pointsOfInterest[j]->getDist());
         }
         adjacencyMatrix.push_back(aux);
         aux.clear();

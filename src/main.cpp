@@ -74,7 +74,7 @@ std::vector<Vertex<T>*> mmpMethod(
     }
 
     Vertex<T> * startPtr = graph.findVertex(start);
-    graph.generateAdjacencyMatrixWithDijkstra(pointsOfInterest, startPtr, finishPtr);
+    std::vector<std::vector<double>> adj = graph.generateAdjacencyMatrixWithDijkstra(pointsOfInterest, startPtr, finishPtr);
 
     return std::vector<Vertex<T>*>();
 }
