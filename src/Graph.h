@@ -110,6 +110,11 @@ public:
     bool addEdge(const T& source, const T& dest, double weight);
 
     void dijkstraShortestPath(const T& source);
+    void floydWarshallShortestPath(std::vector<std::vector<double>> weight, std::vector<std::vector<int>> path);
+    std::vector<std::vector<double>> initializeFloydWarshallWeightVector();
+    std::vector<std::vector< int  >> initializeFloydWarshallPathVector();
+
+    std::vector<std::vector<double>> generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
 
     std::vector<std::vector<double>> generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * origin, Vertex<T> * destination);
 private:
@@ -198,6 +203,66 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
     }
 }
 
+template<class T>
+void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<double>> weight, std::vector<std::vector<int>> path) {
+    unsigned n = vertexSet.size();
+
+    for (unsigned i = 0; i < n; i++) {
+        for (auto e : vertexSet[i]->adj) {
+            int j = findVertexIdx(e.dest->info);
+            weight[i][j] = e.weight;
+            path  [i][j] = i;
+        }
+    }
+
+    for (unsigned k = 0; k < n; k++) {
+        for (unsigned i = 0; i < n; i++) {
+            for (unsigned j = 0; j < n; j++) {
+                if (weight[i][k] == MAX_DOUBLE || weight[k][j] == MAX_DOUBLE)
+                    continue; // avoid overflow
+                int val = weight[i][k] + weight[k][j];
+                if (val < weight[i][j]) {
+                    weight[i][j] = val;
+                    path  [i][j] = path[k][j];
+                }
+            }
+        }
+    }
+}
+
+template<class T>
+std::vector<std::vector<double>> Graph<T>::initializeFloydWarshallWeightVector() {
+    std::vector<std::vector<double>> weight;
+    std::vector<double> aux;
+    for (int i = 0; i < vertexSet.size(); ++ i) {
+        for (int j = 0; j < vertexSet.size(); ++j) {
+            if (i == j) {
+                aux.push_back(0);
+            } else {
+                aux.push_back(MAX_DOUBLE);
+            }
+        }
+        weight.push_back(aux);
+        aux.clear();
+    }
+    return weight;
+}
+
+template<class T>
+std::vector<std::vector<int>> Graph<T>::initializeFloydWarshallPathVector() {
+    std::vector<std::vector<int>> path;
+    std::vector<int> aux;
+    for (int i = 0; i < vertexSet.size(); ++ i) {
+        for (int j = 0; j < vertexSet.size(); ++j) {
+            aux.push_back(-1);
+        }
+        path.push_back(aux);
+        aux.clear();
+    }
+    return path;
+}
+
+
 template <class T>
 std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * origin, Vertex<T> * destination) {
     std::vector<std::vector<double>> adjacencyMatrix;
@@ -220,5 +285,31 @@ std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(c
     }
     return adjacencyMatrix;
 }
+
+template <class T>
+std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
+    std::vector<std::vector<double>> adjacencyMatrix;
+    std::vector<double> aux;
+
+    dijkstraShortestPath(start->getInfo());
+    aux.push_back(finish->getDist());
+    for (int j = 0; j < pointsOfInterest.size(); ++ j) {
+        aux.push_back(pointsOfInterest[j]->getDist());
+    }
+    adjacencyMatrix.push_back(aux);
+    aux.clear();
+
+    for (int i = 0; i < pointsOfInterest.size(); ++ i) {
+        dijkstraShortestPath(pointsOfInterest[i]->getInfo());
+        aux.push_back(finish->getDist());
+        for (int j = 0; j < pointsOfInterest.size(); ++ j) {
+            aux.push_back(pointsOfInterest[j]->getDist());
+        }
+        adjacencyMatrix.push_back(aux);
+        aux.clear();
+    }
+    return adjacencyMatrix;
+}
+
 
 #endif // GRAPH_H
