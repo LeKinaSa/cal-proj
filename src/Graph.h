@@ -110,7 +110,7 @@ public:
     bool addEdge(const T& source, const T& dest, double weight);
 
     void dijkstraShortestPath(const T& source);
-    void floydWarshallShortestPath(std::vector<std::vector<double>> weight, std::vector<std::vector<int>> path);
+    void floydWarshallShortestPath(std::vector<std::vector<double>> & weight, std::vector<std::vector<int>> & path);
     std::vector<std::vector<double>> initializeFloydWarshallWeightVector();
     std::vector<std::vector< int  >> initializeFloydWarshallPathVector();
 
@@ -120,6 +120,7 @@ public:
             const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
 private:
     std::vector<Vertex<T>*> vertexSet;
+    int findVertexIdx(const T& in) const;
 };
 
 template<class T>
@@ -142,6 +143,17 @@ Vertex<T>* Graph<T>::findVertex(const T& info) {
         }
     }
     return nullptr;
+}
+
+/*
+ * Finds the index of the vertex with a given content.
+ */
+template <class T>
+int Graph<T>::findVertexIdx(const T &in) const {
+    for (unsigned i = 0; i < vertexSet.size(); i++)
+        if (vertexSet[i]->info == in)
+            return i;
+    return -1;
 }
 
 template<class T>
@@ -205,7 +217,7 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
 }
 
 template<class T>
-void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<double>> weight, std::vector<std::vector<int>> path) {
+void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<double>> & weight, std::vector<std::vector<int>> & path) {
     unsigned n = vertexSet.size();
 
     for (unsigned i = 0; i < n; i++) {
@@ -292,22 +304,33 @@ std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarsh
     std::vector<std::vector<double>> adjacencyMatrix;
     std::vector<double> aux;
 
-    dijkstraShortestPath(start->getInfo());
-    aux.push_back(finish->getDist());
-    for (int j = 0; j < pointsOfInterest.size(); ++ j) {
-        aux.push_back(pointsOfInterest[j]->getDist());
+    std::vector<std::vector<double>> weight = initializeFloydWarshallWeightVector();
+    std::vector<std::vector< int  >>  path  = initializeFloydWarshallPathVector();
+    floydWarshallShortestPath(weight, path);
+
+    int startIndex  = findVertexIdx(start->getInfo());
+    int finishIndex = findVertexIdx(finish->getInfo());
+
+    aux.push_back(0);
+    for (int j = 0; j < vertexSet.size(); ++ j) {
+        if (vertexSet[j]->isPOI(pointsOfInterest)) {
+            aux.push_back(weight[startIndex][j]);
+        }
     }
     adjacencyMatrix.push_back(aux);
     aux.clear();
 
-    for (int i = 0; i < pointsOfInterest.size(); ++ i) {
-        dijkstraShortestPath(pointsOfInterest[i]->getInfo());
-        aux.push_back(finish->getDist());
-        for (int j = 0; j < pointsOfInterest.size(); ++ j) {
-            aux.push_back(pointsOfInterest[j]->getDist());
+    for (int i = 0; i < vertexSet.size(); ++ i) {
+        if (vertexSet[i]->isPOI(pointsOfInterest)) {
+            aux.push_back(weight[i][finishIndex]);
+            for (int j = 0; j < vertexSet.size(); ++ j) {
+                aux.push_back(weight[i][j]);
+            }
+            adjacencyMatrix.push_back(aux);
+            aux.clear();
         }
-        adjacencyMatrix.push_back(aux);
-        aux.clear();
+
+
     }
     return adjacencyMatrix;
 }
