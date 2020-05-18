@@ -221,7 +221,7 @@ void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<double>> & weig
     unsigned n = vertexSet.size();
 
     for (unsigned i = 0; i < n; i++) {
-        for (auto e : vertexSet[i]->adj) {
+        for (Edge<T> e : vertexSet[i]->adj) {
             int j = findVertexIdx(e.dest->info);
             weight[i][j] = e.weight;
             path  [i][j] = i;
@@ -267,7 +267,12 @@ std::vector<std::vector<int>> Graph<T>::initializeFloydWarshallPathVector() {
     std::vector<int> aux;
     for (int i = 0; i < vertexSet.size(); ++ i) {
         for (int j = 0; j < vertexSet.size(); ++j) {
-            aux.push_back(-1);
+            if (i == j) {
+                aux.push_back(i);
+            }
+            else {
+                aux.push_back(-1);
+            }
         }
         path.push_back(aux);
         aux.clear();
@@ -324,7 +329,9 @@ std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarsh
         if (vertexSet[i]->isPOI(pointsOfInterest)) {
             aux.push_back(weight[i][finishIndex]);
             for (int j = 0; j < vertexSet.size(); ++ j) {
-                aux.push_back(weight[i][j]);
+                if (vertexSet[j]->isPOI(pointsOfInterest)) {
+                    aux.push_back(weight[i][j]);
+                }
             }
             adjacencyMatrix.push_back(aux);
             aux.clear();
