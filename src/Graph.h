@@ -111,7 +111,8 @@ public:
 
     void dijkstraShortestPath(const T& source);
 
-    std::vector<std::vector<double>> generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
+    std::vector<std::vector<double>> generateAdjacencyMatrixWithDijkstra(
+            const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
 private:
     std::vector<Vertex<T>*> vertexSet;
 };
@@ -199,27 +200,25 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
 }
 
 template <class T>
-std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
+std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
+        const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
     std::vector<std::vector<double>> adjacencyMatrix;
-    std::vector<double> aux;
+    adjacencyMatrix.resize(pointsOfInterest.size() + 1);
 
     dijkstraShortestPath(start->getInfo());
-    aux.push_back(finish->getDist());
-    for (int j = 0; j < pointsOfInterest.size(); ++ j) {
-        aux.push_back(pointsOfInterest[j]->getDist());
+    adjacencyMatrix[0].push_back(start->getDist());
+    for (Vertex<T>* POI : pointsOfInterest) {
+        adjacencyMatrix[0].push_back(POI->getDist());
     }
-    adjacencyMatrix.push_back(aux);
-    aux.clear();
 
-    for (int i = 0; i < pointsOfInterest.size(); ++ i) {
+    for (int i = 0; i < pointsOfInterest.size(); ++i) {
         dijkstraShortestPath(pointsOfInterest[i]->getInfo());
-        aux.push_back(finish->getDist());
-        for (int j = 0; j < pointsOfInterest.size(); ++ j) {
-            aux.push_back(pointsOfInterest[j]->getDist());
+        adjacencyMatrix[i + 1].push_back(finish->getDist());
+        for (int j = 0; j < pointsOfInterest.size(); ++j) {
+            adjacencyMatrix[i + 1].push_back(pointsOfInterest[j]->getDist());
         }
-        adjacencyMatrix.push_back(aux);
-        aux.clear();
     }
+
     return adjacencyMatrix;
 }
 
