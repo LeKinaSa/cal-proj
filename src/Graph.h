@@ -198,7 +198,6 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
     }
 }
 
-#include <iostream>
 template <class T>
 std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
     std::vector<std::vector<double>> adjacencyMatrix;
