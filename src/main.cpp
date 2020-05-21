@@ -2,7 +2,7 @@
 
 #include <vector>
 
-void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInterest, std::vector<double>& scores) {
+void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInterest, std::vector<float>& scores) {
     for (char c = 'a'; c <= 'k'; ++c) {
         graph.addVertex(c);
     }
@@ -54,10 +54,10 @@ template<class T>
 std::vector<Vertex<T>*> mmpMethod(
         Graph<T>& graph,
         const std::vector<Vertex<T>*>& pointsOfInterest,
-        const std::vector<double>& scores,
+        const std::vector<float>& scores,
         const T& start,
         const T& finish,
-        double budget
+        float budget
         ) {
     graph.dijkstraShortestPath(start);
 
@@ -74,7 +74,7 @@ std::vector<Vertex<T>*> mmpMethod(
     }
 
     Vertex<T> * startPtr = graph.findVertex(start);
-    std::vector<std::vector<double>> adj = graph.generateAdjacencyMatrixWithDijkstra(pointsOfInterest, startPtr, finishPtr);
+    std::vector<std::vector<float>> adj = graph.generateAdjacencyMatrixWithDijkstra(pointsOfInterest, startPtr, finishPtr);
 
     return std::vector<Vertex<T>*>();
 }
@@ -99,7 +99,7 @@ vector<vector<float>> getArticleMatrix () {
 int main() {
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;
-    std::vector<double> scores;
+    std::vector<float> scores;
 
     initReportGraph(graph, pointsOfInterest, scores);
     mmpMethod(graph, pointsOfInterest, scores, 's', 'f', 1000);

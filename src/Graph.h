@@ -9,16 +9,16 @@
 template<class T> class Edge;
 template<class T> class Graph;
 
-constexpr double MAX_DOUBLE = std::numeric_limits<double>::max();
+constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
 template<class T>
 class Vertex {
 public:
     const T& getInfo() const;
-    double getDist() const;
+    float getDist() const;
     Vertex<T>* getPath() const;
 
-    void addEdge(Vertex<T>* dest, double weight);
+    void addEdge(Vertex<T>* dest, float weight);
 
     bool isPOI(const std::vector<Vertex<T>*>& pointsOfInterest);
 
@@ -36,7 +36,7 @@ private:
     std::vector<Edge<T>> adj;
 
     // Fields used in Dijkstra's Shortest Path
-    double dist = 0;
+    float dist = 0;
     Vertex<T>* path = nullptr;
 };
 
@@ -49,7 +49,7 @@ const T& Vertex<T>::getInfo() const {
 }
 
 template<class T>
-double Vertex<T>::getDist() const {
+float Vertex<T>::getDist() const {
     return dist;
 }
 
@@ -59,7 +59,7 @@ Vertex<T>* Vertex<T>::getPath() const {
 }
 
 template<class T>
-void Vertex<T>::addEdge(Vertex<T>* dest, double weight) {
+void Vertex<T>::addEdge(Vertex<T>* dest, float weight) {
     adj.push_back(Edge<T>(dest, weight));
 }
 
@@ -83,16 +83,16 @@ bool Vertex<T>::operator<(const Vertex<T>& vertex) const {
 template<class T>
 class Edge {
 public:
-    Edge(Vertex<T>* dest, double weight);
+    Edge(Vertex<T>* dest, float weight);
     friend class Vertex<T>;
     friend class Graph<T>;
 private:
     Vertex<T>* dest;
-    double weight;
+    float weight;
 };
 
 template<class T>
-Edge<T>::Edge(Vertex<T>* dest, double weight) : dest(dest), weight(weight) {}
+Edge<T>::Edge(Vertex<T>* dest, float weight) : dest(dest), weight(weight) {}
 
 
 /**
@@ -107,11 +107,11 @@ public:
 
     Vertex<T>* findVertex(const T& info);
     bool addVertex(const T& info);
-    bool addEdge(const T& source, const T& dest, double weight);
+    bool addEdge(const T& source, const T& dest, float weight);
 
     void dijkstraShortestPath(const T& source);
 
-    std::vector<std::vector<double>> generateAdjacencyMatrixWithDijkstra(
+    std::vector<std::vector<float>> generateAdjacencyMatrixWithDijkstra(
             const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
 private:
     std::vector<Vertex<T>*> vertexSet;
@@ -149,7 +149,7 @@ bool Graph<T>::addVertex(const T& info) {
 }
 
 template<class T>
-bool Graph<T>::addEdge(const T& source, const T& dest, double weight) {
+bool Graph<T>::addEdge(const T& source, const T& dest, float weight) {
     Vertex<T>* sourcePtr = findVertex(source);
     Vertex<T>* destPtr = findVertex(dest);
 
@@ -173,7 +173,7 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
             queue.insert(vertex);
         }
         else {
-            vertex->dist = MAX_DOUBLE;
+            vertex->dist = MAX_FLOAT;
         }
     }
 
@@ -181,7 +181,7 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
         Vertex<T>* vertex = queue.extractMin();
 
         for (const Edge<T>& edge : vertex->adj) {
-            bool notInQueue = edge.dest->dist == MAX_DOUBLE;
+            bool notInQueue = edge.dest->dist == MAX_FLOAT;
 
             if (edge.dest->dist > vertex->dist + edge.weight) {
                 edge.dest->dist = vertex->dist + edge.weight;
@@ -200,9 +200,9 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
 }
 
 template <class T>
-std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
+std::vector<std::vector<float>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
         const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
-    std::vector<std::vector<double>> adjacencyMatrix;
+    std::vector<std::vector<float>> adjacencyMatrix;
     adjacencyMatrix.resize(pointsOfInterest.size() + 1);
 
     dijkstraShortestPath(start->getInfo());
