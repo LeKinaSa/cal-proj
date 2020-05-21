@@ -111,7 +111,8 @@ public:
 
     void dijkstraShortestPath(const T& source);
 
-    std::vector<std::vector<double>> generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * origin, Vertex<T> * destination);
+    std::vector<std::vector<double>> generateAdjacencyMatrixWithDijkstra(
+            const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
 private:
     std::vector<Vertex<T>*> vertexSet;
 };
@@ -199,25 +200,25 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
 }
 
 template <class T>
-std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * origin, Vertex<T> * destination) {
+std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
+        const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
     std::vector<std::vector<double>> adjacencyMatrix;
-    std::vector<double> aux;
+    adjacencyMatrix.resize(pointsOfInterest.size() + 1);
 
-    for (int i = 0; i < vertexSet.size() - 1; ++ i) {
-        if (vertexSet[i]->isPOI(pointsOfInterest) || vertexSet[i] == origin) {
-            dijkstraShortestPath(vertexSet[i]->getInfo());
-            for (int j = 0; j < vertexSet.size() - 1; ++ j) {
-                if (vertexSet[j]->isPOI(pointsOfInterest)) {
-                    aux.push_back(vertexSet[j]->getDist());
-                }
-                if (vertexSet[j] == origin) {
-                    aux.push_back(destination->getDist());
-                }
-            }
-            adjacencyMatrix.push_back(aux);
-            aux.clear();
+    dijkstraShortestPath(start->getInfo());
+    adjacencyMatrix[0].push_back(start->getDist());
+    for (Vertex<T>* POI : pointsOfInterest) {
+        adjacencyMatrix[0].push_back(POI->getDist());
+    }
+
+    for (int i = 0; i < pointsOfInterest.size(); ++i) {
+        dijkstraShortestPath(pointsOfInterest[i]->getInfo());
+        adjacencyMatrix[i + 1].push_back(finish->getDist());
+        for (int j = 0; j < pointsOfInterest.size(); ++j) {
+            adjacencyMatrix[i + 1].push_back(pointsOfInterest[j]->getDist());
         }
     }
+
     return adjacencyMatrix;
 }
 
