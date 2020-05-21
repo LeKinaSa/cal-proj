@@ -81,6 +81,7 @@ std::vector<Vertex<T>*> mmpMethod(
 
 #include <vector>
 #include "branchAndBound.h"
+#include "nearestNeighbour.h"
 
 using namespace std;
 
@@ -102,5 +103,10 @@ int main() {
 
     initReportGraph(graph, pointsOfInterest, scores);
     mmpMethod(graph, pointsOfInterest, scores, 's', 'f', 1000);
+
+    vector<float> a = {0, 1, 3, 4, 2};
+    auto aa = branchAndBound(getArticleMatrix(), a, 12);
+    auto aaa = nearestNeighbour(getArticleMatrix(), a, 12);
+
     return 0;
 }
