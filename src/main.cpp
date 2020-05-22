@@ -1,6 +1,8 @@
 #include "Graph.h"
 
 #include <vector>
+#include <ctime>
+#include <cstdlib>
 
 void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInterest, std::vector<float>& scores) {
     for (char c = 'a'; c <= 'k'; ++c) {
@@ -82,6 +84,7 @@ std::vector<Vertex<T>*> mmpMethod(
 #include <vector>
 #include "branchAndBound.h"
 #include "nearestNeighbour.h"
+#include "mockMatrixes.h"
 
 using namespace std;
 
@@ -97,6 +100,8 @@ vector<vector<float>> getArticleMatrix () {
 }
 
 int main() {
+    srand (static_cast <unsigned> (time(0)));
+    auto i = randomMatrix(0, 100, 0, 100, 50, 50);
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;
     std::vector<float> scores;
