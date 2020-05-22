@@ -2,8 +2,12 @@
 #include "parsing.h"
 
 #include <vector>
+#include <ctime>
+#include <cstdlib>
+#include "mockMatrixes.h"
 
 using namespace std;
+
 
 void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInterest, std::vector<float>& scores) {
     for (char c = 'a'; c <= 'k'; ++c) {
@@ -95,6 +99,8 @@ vector<vector<float>> getArticleMatrix () {
 
 
 int main() {
+    srand (static_cast <unsigned> (time(0)));
+    auto i = randomMatrix(0, 100, 0, 100, 50, 50);
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;
     std::vector<float> scores;
