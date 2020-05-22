@@ -1,8 +1,13 @@
 #include "Graph.h"
+#include "parsing.h"
 
 #include <vector>
 #include <ctime>
 #include <cstdlib>
+#include "mockMatrixes.h"
+
+using namespace std;
+
 
 void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInterest, std::vector<float>& scores) {
     for (char c = 'a'; c <= 'k'; ++c) {
@@ -81,13 +86,6 @@ std::vector<Vertex<T>*> mmpMethod(
     return std::vector<Vertex<T>*>();
 }
 
-#include <vector>
-#include "branchAndBound.h"
-#include "nearestNeighbour.h"
-#include "mockMatrixes.h"
-
-using namespace std;
-
 vector<vector<float>> getArticleMatrix () {
     vector<vector<float>> res(5 , vector<float>());
     res[0] = {0, 3,  6, 8, 11};
@@ -99,6 +97,7 @@ vector<vector<float>> getArticleMatrix () {
     return res;
 }
 
+
 int main() {
     srand (static_cast <unsigned> (time(0)));
     auto i = randomMatrix(0, 100, 0, 100, 50, 50);
@@ -106,12 +105,34 @@ int main() {
     std::vector<Vertex<char>*> pointsOfInterest;
     std::vector<float> scores;
 
+    /*
     initReportGraph(graph, pointsOfInterest, scores);
     mmpMethod(graph, pointsOfInterest, scores, 's', 'f', 1000);
 
     vector<float> a = {0, 1, 3, 4, 2};
     auto aa = branchAndBound(getArticleMatrix(), a, 12);
-    auto aaa = nearestNeighbour(getArticleMatrix(), a, 12);
+    auto aaa = nearestNeighbour(getArticleMatrix(), a, 12);*/
+
+    Graph<VertexInfo> graph1;
+    std::vector<Vertex<VertexInfo>*> pointsOfInterest1;
+    std::vector<float> scores1;
+
+    std::map<POICategory, float> userPreferences = {
+            {INFORMATION, 1.0},
+            {HOTEL, 1.0},
+            {ATTRACTION, 1.0},
+            {VIEWPOINT, 1.0},
+            {GUEST_HOUSE, 1.0},
+            {PICNIC_SITE, 1.0},
+            {ARTWORK, 1.0},
+            {CAMP_SITE, 1.0},
+            {MUSEUM, 1.0},
+            {UNSPECIFIED, 0.0}
+    };
+
+    parseVertexFile("nodes_lat_lon_porto.txt", graph1);
+    parseEdgeFile("edges_porto.txt", graph1);
+    parseTagsFile("t03_tags_porto.txt", graph1, pointsOfInterest1, scores1, userPreferences);
 
     return 0;
 }
