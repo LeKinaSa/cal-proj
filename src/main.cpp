@@ -49,7 +49,6 @@ void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInt
     scores.push_back(4.0);
 }
 
-#include <iostream>
 template<class T>
 std::vector<Vertex<T>*> mmpMethod(
         Graph<T>& graph,
@@ -75,23 +74,6 @@ std::vector<Vertex<T>*> mmpMethod(
 
     Vertex<T> * startPtr = graph.findVertex(start);
     std::vector<std::vector<double>> adj = graph.generateAdjacencyMatrixWithDijkstra(pointsOfInterest, startPtr, finishPtr);
-
-    for (int i = 0; i < adj.size(); ++i) {
-        for (int j = 0; j < adj.size(); ++j) {
-            std::cout << adj[i][j] << '\t';
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << std::endl << std::endl;
-    adj = graph.generateAdjacencyMatrixWithFloydWarshall(pointsOfInterest, startPtr, finishPtr);
-
-    for (int i = 0; i < adj.size(); ++i) {
-        for (int j = 0; j < adj.size(); ++j) {
-            std::cout << adj[i][j] << '\t';
-        }
-        std::cout << std::endl;
-    }
 
     return std::vector<Vertex<T>*>();
 }

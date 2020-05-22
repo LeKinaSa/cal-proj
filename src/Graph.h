@@ -280,13 +280,22 @@ std::vector<std::vector<int>> Graph<T>::initializeFloydWarshallPathVector() {
     return path;
 }
 
-
+/**
+ * @brief Reduction Step : Generate Adjacency Matrix using the Dijkstra Method
+ * @tparam T
+ * @param pointsOfInterest
+ * @param start
+ * @param finish
+ * @return adjacencyMatrix
+ */
 template <class T>
 std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
         const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
     std::vector<std::vector<double>> adjacencyMatrix;
     adjacencyMatrix.resize(pointsOfInterest.size() + 1);
 
+    // We construct the adjacency matrix line to line
+    // Starting with the start vertex
     dijkstraShortestPath(start->getInfo());
     adjacencyMatrix[0].push_back(start->getDist());
     for (Vertex<T>* POI : pointsOfInterest) {
@@ -294,6 +303,9 @@ std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
     }
 
     for (int i = 0; i < pointsOfInterest.size(); ++i) {
+        // And then all the other POIs
+        // The first value corresponds to the distance from the POI to the finish vertex
+        //     Which will be the distance to the start vertex when we look at it in the loop format
         dijkstraShortestPath(pointsOfInterest[i]->getInfo());
         adjacencyMatrix[i + 1].push_back(finish->getDist());
         for (int j = 0; j < pointsOfInterest.size(); ++j) {
