@@ -304,6 +304,14 @@ std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
     return adjacencyMatrix;
 }
 
+/**
+ * @brief Reduction Step : Generate Adjacency Matrix using the Floyd Warshall Method
+ * @tparam T
+ * @param pointsOfInterest
+ * @param start
+ * @param finish
+ * @return adjacencyMatrix
+ */
 template <class T>
 std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
     std::vector<std::vector<double>> adjacencyMatrix;
@@ -316,6 +324,8 @@ std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarsh
     int startIndex  = findVertexIdx(start->getInfo());
     int finishIndex = findVertexIdx(finish->getInfo());
 
+    // We construct the adjacency matrix line to line
+    // Starting with the start vertex
     aux.push_back(0);
     for (int j = 0; j < vertexSet.size(); ++ j) {
         if (vertexSet[j]->isPOI(pointsOfInterest)) {
@@ -326,6 +336,9 @@ std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarsh
     aux.clear();
 
     for (int i = 0; i < vertexSet.size(); ++ i) {
+        // And then all the other POIs
+        // The first value corresponds to the distance from the POI to the finish vertex
+        //     Which will be the distance to the start vertex when we look at it in the loop format
         if (vertexSet[i]->isPOI(pointsOfInterest)) {
             aux.push_back(weight[i][finishIndex]);
             for (int j = 0; j < vertexSet.size(); ++ j) {
@@ -336,8 +349,6 @@ std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarsh
             adjacencyMatrix.push_back(aux);
             aux.clear();
         }
-
-
     }
     return adjacencyMatrix;
 }
