@@ -2,6 +2,7 @@
 #include "parsing.h"
 #include "VertexInfo.h"
 
+#include <iostream>
 #include <fstream>
 #include <cmath>
 
@@ -26,7 +27,8 @@ float haversineDistance(const VertexInfo& from, const VertexInfo& to) {
 
 
 void parseVertexFile(const std::string& path, Graph<VertexInfo>& graph) {
-    std::ifstream ifs(path);
+    std::ifstream ifs;
+    ifs.open(path);
 
     size_t numVertices;
     ifs >> numVertices;
@@ -35,9 +37,10 @@ void parseVertexFile(const std::string& path, Graph<VertexInfo>& graph) {
     unsigned int id;
     float latitude, longitude;
 
+    char c;
+
     for (size_t i = 0; i < numVertices; ++i) {
-        getline(ifs, line);
-        sscanf(line.c_str(), "(%ud, %f, %f)", &id, &latitude, &longitude);
+        ifs >> c >> id >> c >> latitude >> c >> longitude >> c;
 
         graph.addVertex(VertexInfo(id, latitude, longitude));
     }
@@ -46,17 +49,19 @@ void parseVertexFile(const std::string& path, Graph<VertexInfo>& graph) {
 }
 
 void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph) {
-    std::ifstream ifs(path);
+    std::ifstream ifs;
+
+    ifs.open(path);
 
     size_t numEdges;
     ifs >> numEdges;
 
     std::string line;
     unsigned int idSource, idDest;
+    char c;
 
     for (size_t i = 0; i < numEdges; ++i) {
-        getline(ifs, line);
-        sscanf(line.c_str(), "(%ud, %ud)", &idSource, &idDest);
+        ifs >> c >> idSource >> c >> idDest >> c;
 
         Vertex<VertexInfo>* sourcePtr = graph.findVertex(idSource);
         Vertex<VertexInfo>* destPtr = graph.findVertex(idDest);
@@ -67,9 +72,29 @@ void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph) {
     ifs.close();
 }
 
-void parseTagsFile(const std::string& path, std::vector<Vertex<VertexInfo>*>& pointsOfInterest,
-        std::vector<float>& scores) {
+void parseTagsFile(const std::string& path, Graph<VertexInfo>& graph,
+        std::vector<Vertex<VertexInfo>*>& pointsOfInterest,
+        std::vector<float>& scores, const std::map<POICategory, float>& userPreferences) {
     std::ifstream ifs(path);
 
-    // TODO: Parse tags file according to user preferences
+    size_t numTags;
+    ifs >> numTags;
+
+    size_t numEntries;
+    std::string line;
+    POICategory category;
+    unsigned int id;
+
+    for (size_t i = 0; i < numTags; ++i) {
+        ifs >> line;
+        category = categoryStringMap.at(line);
+
+        ifs >> numEntries;
+
+        for (size_t j = 0; j < numEntries; ++j) {
+            ifs >> id;
+            pointsOfInterest.push_back(graph.findVertex(id));
+            scores.push_back(userPreferences.at(category));
+        }
+    }
 }
