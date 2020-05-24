@@ -9,6 +9,7 @@
 #include "parsing.h"
 #include "branchAndBound.h"
 #include "nearestNeighbour.h"
+#include "graph_viewer/graphviewer.h"
 
 #include <string>
 #include <vector>
@@ -72,6 +73,9 @@ namespace menu {
 
     template <class T>
     void showPath(const std::vector<Vertex<T>*> & path);
+    template <class T>
+    void showPathOnGraphViewer(const std::vector<Vertex<T>*> & path);
+    void showPathOnGraphViewer(const vector<Vertex<VertexInfo>*> & path);
 
     template <class T>
     T selectStart(const Graph<T> & graph);
@@ -158,6 +162,41 @@ void menu::showPath(const std::vector<Vertex<T>*> & path) {
     std::cout << std::endl;
 }
 
+template <class T>
+void menu::showPathOnGraphViewer(const std::vector<Vertex<T>*> & path) {
+    GraphViewer *gv = new GraphViewer(600, 600, true);
+    gv->createWindow(600, 600);
+    gv->defineVertexColor("grey");
+    gv->defineEdgeColor("black");
+
+    if (path.size() > 0) {
+        gv->addNode(path[0]->getInfo());
+    }
+
+    for (int index = 1; index < path.size(); ++ index) {
+        gv->addNode(path[index]->getInfo());
+        gv->addEdge(index - 1, path[index - 1]->getInfo(), path[index]->getInfo(), EdgeType::DIRECTED);
+    }
+    gv->rearrange();
+}
+
+void menu::showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path) {
+    GraphViewer *gv = new GraphViewer(600, 600, false);
+    gv->createWindow(600, 600);
+    gv->defineVertexColor("grey");
+    gv->defineEdgeColor("black");
+
+    if (path.size() > 0) {
+        gv->addNode(path[0]->getInfo().getId(), path[0]->getInfo().getLatitude(), path[0]->getInfo().getLongitude());
+    }
+
+    for (int index = 1; index < path.size(); ++ index) {
+        gv->addNode(path[index]->getInfo().getId(), path[index]->getInfo().getLatitude(), path[index]->getInfo().getLongitude());
+        gv->addEdge(index - 1, path[index - 1]->getInfo().getId(), path[index]->getInfo().getId(), EdgeType::DIRECTED);
+    }
+    gv->rearrange();
+}
+
 template<class T>
 MENU_TYPE menu::calculateTripMenu(const std::vector<Graph<T>> & graphs, std::vector<float> preferences,
                             const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
@@ -177,7 +216,8 @@ MENU_TYPE menu::calculateTripMenu(const std::vector<Graph<T>> & graphs, std::vec
 
     std::vector<float> scores = menu::calculateScores(pointsOfInterestCategories, preferences);
     std::vector<Vertex<T>*> path = menu::mmpMethod(graph, pointsOfInterest, scores, start, finish, budget, reductionStepAlgorithm, cctspStepAlgorithm);
-    showPath(path);
+    //showPath(path);
+    showPathOnGraphViewer(path);
     optionsMenu("", {}, BACK);
     return MAIN_MENU;
 }

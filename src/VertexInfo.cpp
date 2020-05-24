@@ -25,3 +25,8 @@ bool VertexInfo::operator==(const VertexInfo& otherInfo) const {
 bool VertexInfo::operator==(unsigned int otherId) const {
     return id == otherId;
 }
+
+std::ostream & operator<<(std::ostream & out, const VertexInfo & v) {
+    out << "(" << v.getLatitude() << ", " << v.getLongitude() << ")";
+    return out;
+}

@@ -1,6 +1,7 @@
 #ifndef COORDINATES_H
 #define COORDINATES_H
 
+#include <iostream>
 
 class VertexInfo {
 public:
@@ -13,6 +14,7 @@ public:
 
     bool operator==(const VertexInfo& otherInfo) const;
     bool operator==(unsigned int otherId) const;
+    friend std::ostream & operator<<(std::ostream & out, const VertexInfo & v);
 private:
     unsigned int id;
     float latitude, longitude;
