@@ -164,9 +164,15 @@ MENU_TYPE menu::calculateTripMenu(const std::vector<Graph<T>> & graphs, std::vec
                             REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map) {
 
     Graph<T> graph = graphs[map];
+    T start, finish;
 
-    T start = menu::selectStart(graph);
-    T finish = menu::selectFinish(graph);
+    try {
+        start = menu::selectStart(graph);
+        finish = menu::selectFinish(graph);
+    }
+    catch (std::out_of_range outOfRange) {
+        return MAIN_MENU;
+    }
     float budget = menu::getBudget();
 
     std::vector<float> scores = menu::calculateScores(pointsOfInterestCategories, preferences);
