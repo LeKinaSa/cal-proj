@@ -51,7 +51,9 @@ namespace menu {
 
     MENU_TYPE mainMenu();
     template <class T>
-    MENU_TYPE calculateTripMenu(std::vector<float> preferences, REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map);
+    MENU_TYPE calculateTripMenu(const std::vector<Graph<T>> & graph, std::vector<float> preferences,
+                                const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
+                                REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map);
     MENU_TYPE mapsMenu(MAP & map);
     MENU_TYPE algorithmsMenu(REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm);
     MENU_TYPE preferencesMenu(std::vector<float> & preferences);
@@ -157,22 +159,11 @@ void menu::showPath(const std::vector<Vertex<T>*> & path) {
 }
 
 template<class T>
-MENU_TYPE menu::calculateTripMenu(std::vector<float> preferences, REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map) {
+MENU_TYPE menu::calculateTripMenu(const std::vector<Graph<T>> & graphs, std::vector<float> preferences,
+                            const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
+                            REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map) {
 
-    Graph<T> graph;
-    std::string vertexPath;
-    std::string edgePath;
-    std::string tagsPath;
-    switch (map) {
-        case PORTO:
-            break;
-        default:
-            return MAIN_MENU;
-    }
-
-    parseVertexFile(vertexPath, graph);
-    parseEdgeFile(edgePath, graph);
-    parseTagsFile(tagsPath, graph, pointsOfInterest, pointsOfInterestCategories);
+    Graph<T> graph = graphs[map];
 
     T start = menu::selectStart(graph);
     T finish = menu::selectFinish(graph);
@@ -186,7 +177,7 @@ MENU_TYPE menu::calculateTripMenu(std::vector<float> preferences, REDUCTION_STEP
 }
 
 template <class T>
-void menu::menuLoop() {
+void menu::menuLoop(const std::vector<Graph<T>> & graphs, const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories) {
     std::vector<float> preferences = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     MAP map = PORTO;
     REDUCTION_STEP_ALGORITHM reductionStepAlgorithm = DIJKSTRA;
@@ -199,7 +190,8 @@ void menu::menuLoop() {
                 menu = menu::mainMenu();
                 break;
             case CALCULATE_TRIP_MENU:
-                menu = menu::calculateTripMenu(preferences, reductionStepAlgorithm, cctspStepAlgorithm, map);
+                menu = menu::calculateTripMenu(graphs, preferences, pointsOfInterest, pointsOfInterestCategories,
+                                         reductionStepAlgorithm, cctspStepAlgorithm, map);
                 break;
             case MAP_MENU:
                 menu = menu::mapsMenu(map);
