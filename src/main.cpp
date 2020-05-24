@@ -5,6 +5,7 @@
 #include <ctime>
 #include <cstdlib>
 #include "mockMatrixes.h"
+#include "CCTSPbenchmark.h"
 
 using namespace std;
 
@@ -100,6 +101,7 @@ vector<vector<float>> getArticleMatrix () {
 
 int main() {
     srand (static_cast <unsigned> (time(0)));
+    benchmarkCCTSP();
     auto i = randomMatrix(0, 100, 0, 100, 50, 50);
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;

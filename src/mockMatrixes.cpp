@@ -60,12 +60,8 @@ std::vector<std::vector<float>> randomMatrix(float minX, float maxX, float minY,
 
 std::vector<float> randomScores(int size) {
     vector<float> res;
-    for (int i = 0; i < size; i++) {
-        if (i == 0) {
-            res.push_back(0);
-        } else {
-            res.push_back(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)); // Random value from 0 to 1
-        }
+    for (int i = 1; i < size; i++) {
+        res.push_back(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)); // Random value from 0 to 1
     }
     return res;
 }

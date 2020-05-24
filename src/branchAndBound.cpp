@@ -6,6 +6,8 @@
 
 #include <utility>
 #include <queue>
+#include <cstdlib>
+#include <iostream>
 
 using namespace std;
 
@@ -45,7 +47,7 @@ public:
             float newCost = pathCost - adjMatrix[lastPathIndex][0]
                     + adjMatrix[lastPathIndex][index] + adjMatrix[index][0];
 
-            float newScore = score + scores[index];
+            float newScore = score + scores[index - 1];
 
             if (newCost <= budget) {
                 // copying the vectors
@@ -73,6 +75,18 @@ public:
 
 vector<int>
 branchAndBound(const vector<vector<float>> &adjMatrix, const vector<float> &scores, const float budget) {
+    int mSize = adjMatrix.size();
+    if (scores.size() != mSize - 1) {
+        cerr << "Invalid args" << endl;
+        exit(1);
+    }
+    for (const vector<float> &i : adjMatrix) {
+        if (i.size() != mSize) {
+            cerr << "Invalid args" << endl;
+            exit(1);
+        }
+    }
+
     Vertex currentBest = Vertex(adjMatrix);
 
     queue<Vertex> solutions;
