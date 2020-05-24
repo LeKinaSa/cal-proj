@@ -25,6 +25,11 @@ float haversineDistance(const VertexInfo& from, const VertexInfo& to) {
             cos(fromLatRad) * cos(toLatRad) * pow(sin(longitudeDiff / 2), 2)));
 }
 
+// Interpret lat and long as x and y values (use euclidean distance formula)
+float euclideanDistance(const VertexInfo& from, const VertexInfo& to) {
+    return sqrt(pow(from.getLatitude() - to.getLatitude(), 2) + pow(from.getLongitude() - to.getLongitude(), 2));
+}
+
 
 void parseVertexFile(const std::string& path, Graph<VertexInfo>& graph) {
     std::ifstream ifs;
@@ -48,7 +53,7 @@ void parseVertexFile(const std::string& path, Graph<VertexInfo>& graph) {
     ifs.close();
 }
 
-void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph) {
+void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph, bool haversine) {
     std::ifstream ifs;
 
     ifs.open(path);
@@ -66,6 +71,9 @@ void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph) {
         Vertex<VertexInfo>* sourcePtr = graph.findVertex(idSource);
         Vertex<VertexInfo>* destPtr = graph.findVertex(idDest);
 
+        float dist = haversine ? haversineDistance(sourcePtr->getInfo(), destPtr->getInfo()) :
+                euclideanDistance(sourcePtr->getInfo(), destPtr->getInfo());
+
         graph.addEdge(idSource, idDest, haversineDistance(sourcePtr->getInfo(), destPtr->getInfo()));
     }
 
@@ -73,8 +81,8 @@ void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph) {
 }
 
 void parseTagsFile(const std::string& path, Graph<VertexInfo>& graph,
-        std::vector<Vertex<VertexInfo>*>& pointsOfInterest,
-        std::vector<float>& scores, const std::map<POICategory, float>& userPreferences) {
+        std::vector<Vertex<VertexInfo>*>& pointsOfInterest, std::vector<POICategory>& categories) {
+
     std::ifstream ifs(path);
 
     size_t numTags;
@@ -94,7 +102,7 @@ void parseTagsFile(const std::string& path, Graph<VertexInfo>& graph,
         for (size_t j = 0; j < numEntries; ++j) {
             ifs >> id;
             pointsOfInterest.push_back(graph.findVertex(id));
-            scores.push_back(userPreferences.at(category));
+            categories.push_back(category);
         }
     }
 }
