@@ -99,7 +99,7 @@ vector<vector<float>> getArticleMatrix () {
 
 
 int main() {
-    srand (static_cast <unsigned> (time(0)));
+    srand(static_cast<unsigned>(time(nullptr)));
     auto i = randomMatrix(0, 100, 0, 100, 50, 50);
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;
