@@ -45,10 +45,11 @@ std::vector<Vertex<T>*> reconstructPath(Graph<T>& graph, T start, T finish,
 
         do {
             // We insert at the beginning to invert the order of the vertices
-            pathFragment.insert(pathFragment.begin(), v);
+            if (v->getPath() != nullptr)
+                pathFragment.insert(pathFragment.begin(), v);
 
             v = v->getPath();
-        } while (v->getPath() != nullptr);
+        } while (v != nullptr);
 
         path.insert(path.end(), pathFragment.begin(), pathFragment.end());
 
@@ -60,10 +61,11 @@ std::vector<Vertex<T>*> reconstructPath(Graph<T>& graph, T start, T finish,
 
     do {
         // We insert at the beginning to invert the order of the vertices
-        pathFragment.insert(pathFragment.begin(), finishPtr);
+        if (finishPtr->getPath() != nullptr)
+            pathFragment.insert(pathFragment.begin(), finishPtr);
 
         finishPtr = finishPtr->getPath();
-    } while (finishPtr->getPath() != nullptr);
+    } while (finishPtr != nullptr);
 
 
     path.insert(path.end(), pathFragment.begin(), pathFragment.end());
@@ -132,6 +134,7 @@ int main() {
     benchmarkCCTSP();
     auto i = randomMatrix(0, 100, 0, 100, 50, 50);
     srand(time(nullptr));
+    //benchmarkCCTSP();
 
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;
