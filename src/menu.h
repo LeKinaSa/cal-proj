@@ -19,9 +19,11 @@ enum MenuType {
     EXIT_MENU
 };
 
-enum MAP {
-    PORTO,
-    AVEIRO
+enum CityMap {
+    GRID_4X4,
+    GRID_8X8,
+    GRID_16X16,
+    REPORT
 };
 
 enum ReductionStepAlgorithm {
@@ -44,31 +46,16 @@ namespace menu {
         NONE
     };
 
-    template <class T>
-    void menuLoop(const std::vector<Graph<T>> & graphs, const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories);
+    void menuLoop();
     int optionsMenu(const std::string & title, const std::vector<std::string> & options, OPTION option);
     float getFloatValue();
 
     MenuType mainMenu();
-    template <class T>
-    MenuType calculateTripMenu(const std::vector<Graph<T>> & graph, std::vector<float> preferences,
-                               const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
-                               ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm, MAP & map);
-    MenuType mapsMenu(MAP & map);
+    MenuType calculateTripMenu(const std::vector<float>& preferences,
+            ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm, CityMap & map);
+    MenuType mapsMenu(CityMap & map);
     MenuType algorithmsMenu(ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm);
     MenuType preferencesMenu(std::vector<float> & preferences);
-
-    template <class T>
-    std::vector<Vertex<T>*> mmpMethod(
-            Graph<T> & graph,
-            const std::vector<Vertex<T>*>& pointsOfInterest,
-            const std::vector<float>& scores,
-            const T& start,
-            const T& finish,
-            float budget,
-            const ReductionStepAlgorithm & reductionStepAlgorithm,
-            const CCTSPStepAlgorithm & cctspStepAlgorithm
-    );
 
     template <class T>
     void showPath(const std::vector<Vertex<T>*> & path);
@@ -76,17 +63,64 @@ namespace menu {
     void showPathOnGraphViewer(const std::vector<Vertex<char>*> & path);
     void showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path);
 
-    template <class T>
-    T selectStart(const Graph<T> & graph);
-    template <class T>
-    T selectFinish(const Graph<T> & graph);
+    unsigned int selectVertex(const Graph<VertexInfo>& graph);
+
     float getBudget();
-    std::vector<float> calculateScores(const std::vector<POICategory> & pointsOfInterestCategories, const std::vector<float> preferences);
+    std::vector<float> calculateScores(const std::vector<POICategory> & pointsOfInterestCategories,
+            const std::vector<float>& preferences);
 }
 
+/** Reconstructs the full path from the cost-constrained TSP path. */
+template<class T>
+std::vector<Vertex<T>*> reconstructPath(Graph<T>& graph, T start, T finish,
+                                        const std::vector<std::vector<float>>& adjMatrix, const std::vector<Vertex<T>*>& pointsOfInterest,
+                                        const std::vector<int>& tspPath) {
+
+    std::vector<Vertex<T>*> path, pathFragment;
+    path.push_back(graph.findVertex(start));
+
+    graph.dijkstraShortestPath(start);
+
+    for (int i = 1; i < tspPath.size(); ++i) {
+        int idx = tspPath.at(i);
+
+        Vertex<T>* poi = pointsOfInterest.at(idx - 1);
+        Vertex<T>* v = poi;
+
+        pathFragment.clear();
+
+        do {
+            // We insert at the beginning to invert the order of the vertices
+            if (v->getPath() != nullptr)
+                pathFragment.insert(pathFragment.begin(), v);
+
+            v = v->getPath();
+        } while (v != nullptr);
+
+        path.insert(path.end(), pathFragment.begin(), pathFragment.end());
+
+        graph.dijkstraShortestPath(poi->getInfo());
+    }
+
+    pathFragment.clear();
+    Vertex<T>* finishPtr = graph.findVertex(finish);
+
+    do {
+        // We insert at the beginning to invert the order of the vertices
+        if (finishPtr->getPath() != nullptr)
+            pathFragment.insert(pathFragment.begin(), finishPtr);
+
+        finishPtr = finishPtr->getPath();
+    } while (finishPtr != nullptr);
+
+
+    path.insert(path.end(), pathFragment.begin(), pathFragment.end());
+
+    return path;
+}
 
 template<class T>
-std::vector<Vertex<T>*> menu::mmpMethod(
+std::vector<Vertex<T>*> mmpMethod(
         Graph<T> & graph,
         const std::vector<Vertex<T>*>& pointsOfInterest,
         const std::vector<float>& scores,
@@ -139,18 +173,6 @@ std::vector<Vertex<T>*> menu::mmpMethod(
     return reconstructPath(graph, start, finish, adj, pointsOfInterest, tspPath);
 }
 
-template<class T>
-T menu::selectStart(const Graph<T> & graph) {
-    int answer = optionsMenu("Select Start Vertex", graph.getStringList(), menu::BACK);
-    return (graph.getVertexSet().at(answer - 1))->getInfo();
-}
-
-template<class T>
-T menu::selectFinish(const Graph<T> & graph) {
-    int answer = optionsMenu("Select Finish Vertex", graph.getStringList(), menu::BACK);
-    return (graph.getVertexSet().at(answer - 1))->getInfo();
-}
-
 template <class T>
 void menu::showPath(const std::vector<Vertex<T>*> & path) {
     menu::optionsMenu("Best Path", {}, menu::NONE);
@@ -160,63 +182,5 @@ void menu::showPath(const std::vector<Vertex<T>*> & path) {
     }
     std::cout << std::endl;
 }
-
-template<class T>
-MenuType menu::calculateTripMenu(const std::vector<Graph<T>> & graphs, std::vector<float> preferences,
-                                 const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
-                                 ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm, MAP & map) {
-
-    Graph<T> graph = graphs[map];
-    T start, finish;
-
-    try {
-        start = menu::selectStart(graph);
-        finish = menu::selectFinish(graph);
-    }
-    catch (const std::out_of_range& outOfRange) {
-        return MAIN_MENU;
-    }
-    float budget = menu::getBudget();
-
-    std::vector<float> scores = menu::calculateScores(pointsOfInterestCategories, preferences);
-    std::vector<Vertex<T>*> path = menu::mmpMethod(graph, pointsOfInterest, scores, start, finish, budget, reductionStepAlgorithm, cctspStepAlgorithm);
-    //showPath(path);
-    showPathOnGraphViewer(path);
-    optionsMenu("", {}, BACK);
-    return MAIN_MENU;
-}
-
-template <class T>
-void menu::menuLoop(const std::vector<Graph<T>> & graphs, const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories) {
-    std::vector<float> preferences = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    MAP map = PORTO;
-    ReductionStepAlgorithm reductionStepAlgorithm = DIJKSTRA;
-    CCTSPStepAlgorithm cctspStepAlgorithm = BRANCH_AND_BOUND;
-
-    MenuType menu = MAIN_MENU;
-    while (menu != EXIT_MENU) {
-        switch (menu) {
-            case MAIN_MENU:
-                menu = menu::mainMenu();
-                break;
-            case CALCULATE_TRIP_MENU:
-                menu = menu::calculateTripMenu(graphs, preferences, pointsOfInterest, pointsOfInterestCategories,
-                                         reductionStepAlgorithm, cctspStepAlgorithm, map);
-                break;
-            case MAP_MENU:
-                menu = menu::mapsMenu(map);
-                break;
-            case ALGORITHM_MENU:
-                menu = menu::algorithmsMenu(reductionStepAlgorithm, cctspStepAlgorithm);
-                break;
-            case PREFERENCES_MENU:
-                menu = menu::preferencesMenu(preferences);
-                break;
-            default:
-                break;
-        }
-    }
-}
-
 
 #endif // MENU_H
