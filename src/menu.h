@@ -156,7 +156,6 @@ void menu::showPath(const std::vector<Vertex<T>*> & path) {
         std::cout << " - " << (path[index])->getInfo();
     }
     std::cout << std::endl;
-    menu::optionsMenu("", {}, menu::BACK);
 }
 
 template<class T>

@@ -4,6 +4,7 @@
 #include "MutablePriorityQueue.h"
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <limits>
@@ -140,12 +141,13 @@ std::vector<Vertex<T>*> Graph<T>::getVertexSet() const {
 
 template <class T>
 std::vector<std::string> Graph<T>::getStringList() const {
+    stringstream ss;
     std::vector<std::string> stringList;
     std::string answer;
 
     for (Vertex<T>* vertex : vertexSet) {
-        std::cout << vertex->getInfo() << std::endl;
-        getline(std::cin, answer);
+        ss << vertex->getInfo() << std::endl;
+        getline(ss, answer);
         stringList.push_back(answer);
     }
 
