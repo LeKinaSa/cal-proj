@@ -173,7 +173,7 @@ void menu::showPathOnGraphViewer(const std::vector<Vertex<T>*> & path) {
         gv->addNode(path[0]->getInfo());
     }
 
-    for (int index = 1; index < path.size(); ++ index) {
+    for (int index = 1; index < path.size(); ++index) {
         gv->addNode(path[index]->getInfo());
         gv->addEdge(index - 1, path[index - 1]->getInfo(), path[index]->getInfo(), EdgeType::DIRECTED);
     }
