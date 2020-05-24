@@ -109,17 +109,15 @@ void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInt
     graph.addEdge('s', 'd', 3.0);
 
     pointsOfInterest.push_back(graph.findVertex('b'));
+    pointsOfInterest.push_back(graph.findVertex('h'));
     pointsOfInterest.push_back(graph.findVertex('i'));
     pointsOfInterest.push_back(graph.findVertex('j'));
-    pointsOfInterest.push_back(graph.findVertex('h'));
 
     scores.push_back(1.0);
     scores.push_back(3.0);
     scores.push_back(4.0);
     scores.push_back(2.0);
 }
-
-
 
 
 int main() {

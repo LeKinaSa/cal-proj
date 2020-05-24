@@ -113,11 +113,17 @@ public:
     bool addEdge(const T& source, const T& dest, float weight);
 
     void dijkstraShortestPath(const T& source);
+    void floydWarshallShortestPath(std::vector<std::vector<double>> & weight, std::vector<std::vector<int>> & path);
+    std::vector<std::vector<double>> initializeFloydWarshallWeightVector();
+    std::vector<std::vector< int  >> initializeFloydWarshallPathVector();
+
+    std::vector<std::vector<double>> generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
 
     std::vector<std::vector<float>> generateAdjacencyMatrixWithDijkstra(
             const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
 private:
     std::vector<Vertex<T>*> vertexSet;
+    int findVertexIdx(const T& in) const;
 };
 
 template<class T>
@@ -154,6 +160,17 @@ Vertex<T>* Graph<T>::findVertex(const T& info) {
         }
     }
     return nullptr;
+}
+
+/*
+ * Finds the index of the vertex with a given content.
+ */
+template <class T>
+int Graph<T>::findVertexIdx(const T &in) const {
+    for (unsigned i = 0; i < vertexSet.size(); i++)
+        if (vertexSet[i]->info == in)
+            return i;
+    return -1;
 }
 
 template<class T>
@@ -216,12 +233,86 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
     }
 }
 
+template<class T>
+void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<double>> & weight, std::vector<std::vector<int>> & path) {
+    unsigned n = vertexSet.size();
+
+    for (unsigned i = 0; i < n; i++) {
+        for (Edge<T> e : vertexSet[i]->adj) {
+            int j = findVertexIdx(e.dest->info);
+            weight[i][j] = e.weight;
+            path  [i][j] = i;
+        }
+    }
+
+    for (unsigned k = 0; k < n; k++) {
+        for (unsigned i = 0; i < n; i++) {
+            for (unsigned j = 0; j < n; j++) {
+                if (weight[i][k] == MAX_DOUBLE || weight[k][j] == MAX_DOUBLE)
+                    continue; // avoid overflow
+                int val = weight[i][k] + weight[k][j];
+                if (val < weight[i][j]) {
+                    weight[i][j] = val;
+                    path  [i][j] = path[k][j];
+                }
+            }
+        }
+    }
+}
+
+template<class T>
+std::vector<std::vector<double>> Graph<T>::initializeFloydWarshallWeightVector() {
+    std::vector<std::vector<double>> weight;
+    std::vector<double> aux;
+    for (int i = 0; i < vertexSet.size(); ++ i) {
+        for (int j = 0; j < vertexSet.size(); ++j) {
+            if (i == j) {
+                aux.push_back(0);
+            } else {
+                aux.push_back(MAX_DOUBLE);
+            }
+        }
+        weight.push_back(aux);
+        aux.clear();
+    }
+    return weight;
+}
+
+template<class T>
+std::vector<std::vector<int>> Graph<T>::initializeFloydWarshallPathVector() {
+    std::vector<std::vector<int>> path;
+    std::vector<int> aux;
+    for (int i = 0; i < vertexSet.size(); ++ i) {
+        for (int j = 0; j < vertexSet.size(); ++j) {
+            if (i == j) {
+                aux.push_back(i);
+            }
+            else {
+                aux.push_back(-1);
+            }
+        }
+        path.push_back(aux);
+        aux.clear();
+    }
+    return path;
+}
+
+/**
+ * @brief Reduction Step : Generate Adjacency Matrix using the Dijkstra Method
+ * @tparam T
+ * @param pointsOfInterest
+ * @param start
+ * @param finish
+ * @return adjacencyMatrix
+ */
 template <class T>
 std::vector<std::vector<float>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
         const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
     std::vector<std::vector<float>> adjacencyMatrix;
     adjacencyMatrix.resize(pointsOfInterest.size() + 1);
 
+    // We construct the adjacency matrix line to line
+    // Starting with the start vertex
     dijkstraShortestPath(start->getInfo());
     adjacencyMatrix[0].push_back(start->getDist());
     for (Vertex<T>* POI : pointsOfInterest) {
@@ -229,6 +320,9 @@ std::vector<std::vector<float>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
     }
 
     for (int i = 0; i < pointsOfInterest.size(); ++i) {
+        // And then all the other POIs
+        // The first value corresponds to the distance from the POI to the finish vertex
+        //     Which will be the distance to the start vertex when we look at it in the loop format
         dijkstraShortestPath(pointsOfInterest[i]->getInfo());
         adjacencyMatrix[i + 1].push_back(finish->getDist());
         for (int j = 0; j < pointsOfInterest.size(); ++j) {
@@ -238,5 +332,55 @@ std::vector<std::vector<float>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
 
     return adjacencyMatrix;
 }
+
+/**
+ * @brief Reduction Step : Generate Adjacency Matrix using the Floyd Warshall Method
+ * @tparam T
+ * @param pointsOfInterest
+ * @param start
+ * @param finish
+ * @return adjacencyMatrix
+ */
+template <class T>
+std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
+    std::vector<std::vector<double>> adjacencyMatrix;
+    std::vector<double> aux;
+
+    std::vector<std::vector<double>> weight = initializeFloydWarshallWeightVector();
+    std::vector<std::vector< int  >>  path  = initializeFloydWarshallPathVector();
+    floydWarshallShortestPath(weight, path);
+
+    int startIndex  = findVertexIdx(start->getInfo());
+    int finishIndex = findVertexIdx(finish->getInfo());
+
+    // We construct the adjacency matrix line to line
+    // Starting with the start vertex
+    aux.push_back(0);
+    for (int j = 0; j < vertexSet.size(); ++ j) {
+        if (vertexSet[j]->isPOI(pointsOfInterest)) {
+            aux.push_back(weight[startIndex][j]);
+        }
+    }
+    adjacencyMatrix.push_back(aux);
+    aux.clear();
+
+    for (int i = 0; i < vertexSet.size(); ++ i) {
+        // And then all the other POIs
+        // The first value corresponds to the distance from the POI to the finish vertex
+        //     Which will be the distance to the start vertex when we look at it in the loop format
+        if (vertexSet[i]->isPOI(pointsOfInterest)) {
+            aux.push_back(weight[i][finishIndex]);
+            for (int j = 0; j < vertexSet.size(); ++ j) {
+                if (vertexSet[j]->isPOI(pointsOfInterest)) {
+                    aux.push_back(weight[i][j]);
+                }
+            }
+            adjacencyMatrix.push_back(aux);
+            aux.clear();
+        }
+    }
+    return adjacencyMatrix;
+}
+
 
 #endif // GRAPH_H
