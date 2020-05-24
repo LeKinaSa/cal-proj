@@ -107,7 +107,6 @@ public:
     ~Graph();
 
     std::vector<Vertex<T>*> getVertexSet() const;
-    std::vector<std::string> getStringList() const;
 
     Vertex<T>* findVertex(const T& info);
     bool addVertex(const T& info);
@@ -139,21 +138,6 @@ std::vector<Vertex<T>*> Graph<T>::getVertexSet() const {
     return vertexSet;
 }
 
-template <class T>
-std::vector<std::string> Graph<T>::getStringList() const {
-    stringstream ss;
-    std::vector<std::string> stringList;
-    std::string answer;
-
-    for (Vertex<T>* vertex : vertexSet) {
-        ss << vertex->getInfo() << std::endl;
-        getline(ss, answer);
-        stringList.push_back(answer);
-    }
-
-    return stringList;
-}
-
 template<class T>
 Vertex<T>* Graph<T>::findVertex(const T& info) {
     for (auto v : vertexSet) {
@@ -164,8 +148,8 @@ Vertex<T>* Graph<T>::findVertex(const T& info) {
     return nullptr;
 }
 
-/*
- * Finds the index of the vertex with a given content.
+/**
+ * @brief Finds the index of the vertex with a given content.
  */
 template <class T>
 int Graph<T>::findVertexIdx(const T &in) const {
@@ -196,6 +180,11 @@ bool Graph<T>::addEdge(const T& source, const T& dest, float weight) {
     return true;
 }
 
+/**
+ * @brief Calculates the shortest path from a given vertex to all others using
+ * Dijkstra's algorithm.
+ * @param source    source vertex information
+ */
 template<class T>
 void Graph<T>::dijkstraShortestPath(const T& source) {
     MutablePriorityQueue<Vertex<T>> queue;
@@ -235,6 +224,11 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
     }
 }
 
+/**
+ * @brief Calculates the shortest paths for every pair of vertices, creating adjacency matrices.
+ * @param weight    adjacency matrix for the cost of the paths
+ * @param path      adjacency matrix for the next vertex in the paths
+ */
 template<class T>
 void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<float>> & weight, std::vector<std::vector<int>> & path) {
     unsigned n = vertexSet.size();
