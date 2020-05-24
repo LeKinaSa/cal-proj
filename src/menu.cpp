@@ -190,18 +190,18 @@ void menu::showPathOnGraphViewer(const std::vector<Vertex<char>*> & path) {
     gv->rearrange();
 }
 
-void menu::showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path) {
+void menu::showPathOnGraphViewer(const std::vector<Vertex<PosInfo>*> & path) {
     GraphViewer *gv = new GraphViewer(600, 600, false);
     gv->createWindow(600, 600);
     gv->defineVertexColor("grey");
     gv->defineEdgeColor("black");
 
     if (!path.empty()) {
-        gv->addNode(path[0]->getInfo().getId(), path[0]->getInfo().getLatitude(), path[0]->getInfo().getLongitude());
+        gv->addNode(path[0]->getInfo().getId(), path[0]->getInfo().getX(), path[0]->getInfo().getY());
     }
 
     for (int index = 1; index < path.size(); ++ index) {
-        gv->addNode(path[index]->getInfo().getId(), path[index]->getInfo().getLatitude(), path[index]->getInfo().getLongitude());
+        gv->addNode(path[index]->getInfo().getId(), path[index]->getInfo().getX(), path[index]->getInfo().getY());
         gv->addEdge(index - 1, path[index - 1]->getInfo().getId(), path[index]->getInfo().getId(), EdgeType::DIRECTED);
     }
 
@@ -209,7 +209,7 @@ void menu::showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path) 
 }
 
 
-unsigned int menu::selectVertex(const Graph<VertexInfo>& graph) {
+unsigned int menu::selectVertex(const Graph<PosInfo>& graph) {
     std::cout << "Enter a vertex id between 0 and " << graph.getVertexSet().size() - 1 << std::endl;
 
     std::string answer;
@@ -315,8 +315,8 @@ MenuType menu::calculateTripMenu(const std::vector<float>& preferences,
         // showPathOnGraphViewer(path);
     }
     else {
-        Graph<VertexInfo> graph;
-        std::vector<Vertex<VertexInfo>*> pointsOfInterest;
+        Graph<PosInfo> graph;
+        std::vector<Vertex<PosInfo>*> pointsOfInterest;
         std::vector<POICategory> categories;
 
         std::string filePath;
@@ -336,8 +336,8 @@ MenuType menu::calculateTripMenu(const std::vector<float>& preferences,
 
         float budget = getBudget();
 
-        std::vector<Vertex<VertexInfo>*> path = mmpMethod(graph, pointsOfInterest, scores,
-                VertexInfo(start), VertexInfo(finish), budget, reductionStepAlgorithm, cctspStepAlgorithm);
+        std::vector<Vertex<PosInfo>*> path = mmpMethod(graph, pointsOfInterest, scores,
+                                                       PosInfo(start), PosInfo(finish), budget, reductionStepAlgorithm, cctspStepAlgorithm);
 
         showPath(path);
 

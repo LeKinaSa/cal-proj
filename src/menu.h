@@ -61,9 +61,9 @@ namespace menu {
     void showPath(const std::vector<Vertex<T>*> & path);
 
     void showPathOnGraphViewer(const std::vector<Vertex<char>*> & path);
-    void showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path);
+    void showPathOnGraphViewer(const std::vector<Vertex<PosInfo>*> & path);
 
-    unsigned int selectVertex(const Graph<VertexInfo>& graph);
+    unsigned int selectVertex(const Graph<PosInfo>& graph);
 
     float getBudget();
     std::vector<float> calculateScores(const std::vector<POICategory> & pointsOfInterestCategories,

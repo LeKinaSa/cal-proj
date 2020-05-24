@@ -1,6 +1,6 @@
 
 #include "parsing.h"
-#include "VertexInfo.h"
+#include "PosInfo.h"
 
 #include <iostream>
 #include <fstream>
@@ -12,11 +12,16 @@ float degreesToRadians(float degrees) {
     return M_PI * degrees / 180.0;
 }
 
-float haversineDistance(const VertexInfo& from, const VertexInfo& to) {
-    float fromLatRad = degreesToRadians(from.getLatitude());
-    float fromLongRad = degreesToRadians(from.getLongitude());
-    float toLatRad = degreesToRadians(to.getLatitude());
-    float toLongRad = degreesToRadians(to.getLongitude());
+/**
+ * @brief Calculates the distance between two points using the haversine formula. Interprets x and y as x and
+ * y, respectively.
+ * @return  distance between the points, in meters
+ */
+float haversineDistance(const PosInfo& from, const PosInfo& to) {
+    float fromLatRad = degreesToRadians(from.getX());
+    float fromLongRad = degreesToRadians(from.getY());
+    float toLatRad = degreesToRadians(to.getX());
+    float toLongRad = degreesToRadians(to.getY());
 
     float latitudeDiff = toLatRad - fromLatRad;
     float longitudeDiff = toLongRad - fromLongRad;
@@ -25,13 +30,15 @@ float haversineDistance(const VertexInfo& from, const VertexInfo& to) {
             cos(fromLatRad) * cos(toLatRad) * pow(sin(longitudeDiff / 2), 2)));
 }
 
-// Interpret lat and long as x and y values (use euclidean distance formula)
-float euclideanDistance(const VertexInfo& from, const VertexInfo& to) {
-    return sqrt(pow(from.getLatitude() - to.getLatitude(), 2) + pow(from.getLongitude() - to.getLongitude(), 2));
+/**
+ * @brief Calculates the euclidean distance between two points
+ */
+float euclideanDistance(const PosInfo& from, const PosInfo& to) {
+    return sqrt(pow(from.getX() - to.getX(), 2) + pow(from.getY() - to.getY(), 2));
 }
 
 
-void parseVertexFile(const std::string& path, Graph<VertexInfo>& graph) {
+void parseVertexFile(const std::string& path, Graph<PosInfo>& graph) {
     std::ifstream ifs;
     ifs.open(path);
 
@@ -47,13 +54,13 @@ void parseVertexFile(const std::string& path, Graph<VertexInfo>& graph) {
     for (size_t i = 0; i < numVertices; ++i) {
         ifs >> c >> id >> c >> latitude >> c >> longitude >> c;
 
-        graph.addVertex(VertexInfo(id, latitude, longitude));
+        graph.addVertex(PosInfo(id, latitude, longitude));
     }
 
     ifs.close();
 }
 
-void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph, bool haversine) {
+void parseEdgeFile(const std::string& path, Graph<PosInfo>& graph, bool haversine) {
     std::ifstream ifs;
 
     ifs.open(path);
@@ -68,8 +75,8 @@ void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph, bool haver
     for (size_t i = 0; i < numEdges; ++i) {
         ifs >> c >> idSource >> c >> idDest >> c;
 
-        Vertex<VertexInfo>* sourcePtr = graph.findVertex(idSource);
-        Vertex<VertexInfo>* destPtr = graph.findVertex(idDest);
+        Vertex<PosInfo>* sourcePtr = graph.findVertex(idSource);
+        Vertex<PosInfo>* destPtr = graph.findVertex(idDest);
 
         float dist = haversine ? haversineDistance(sourcePtr->getInfo(), destPtr->getInfo()) :
                 euclideanDistance(sourcePtr->getInfo(), destPtr->getInfo());
@@ -80,8 +87,8 @@ void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph, bool haver
     ifs.close();
 }
 
-void parseTagsFile(const std::string& path, Graph<VertexInfo>& graph,
-        std::vector<Vertex<VertexInfo>*>& pointsOfInterest, std::vector<POICategory>& categories) {
+void parseTagsFile(const std::string& path, Graph<PosInfo>& graph,
+                   std::vector<Vertex<PosInfo>*>& pointsOfInterest, std::vector<POICategory>& categories) {
 
     std::ifstream ifs(path);
 

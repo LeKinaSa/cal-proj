@@ -1,7 +1,3 @@
-//
-// Created by daniel on 15/05/2020.
-//
-
 #include "branchAndBound.h"
 
 #include <utility>

@@ -1,7 +1,3 @@
-//
-// Created by daniel on 22/05/2020.
-//
-
 #ifndef MOCK_MATRICES_H
 #define MOCK_MATRICES_H
 

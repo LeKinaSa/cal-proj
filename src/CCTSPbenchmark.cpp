@@ -1,7 +1,3 @@
-//
-// Created by daniel on 22/05/2020.
-//
-
 #include <iostream>
 #include <chrono>
 #include "CCTSPbenchmark.h"

@@ -1,7 +1,3 @@
-//
-// Created by daniel on 17/05/2020.
-//
-
 #include <iostream>
 #include "nearestNeighbour.h"
 
