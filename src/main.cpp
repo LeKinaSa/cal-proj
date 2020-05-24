@@ -2,6 +2,7 @@
 #include "parsing.h"
 #include "branchAndBound.h"
 #include "nearestNeighbour.h"
+#include "menu.h"
 
 #include <vector>
 #include <ctime>
@@ -122,7 +123,14 @@ void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInt
 
 
 int main() {
-    srand (static_cast <unsigned> (time(0)));
+    Graph<char> graph;
+    std::vector<Vertex<char>*> pois;
+    std::vector<float> scores;
+    initReportGraph(graph, pois, scores);
+    std::vector<POICategory> cat = {HOTEL, HOTEL, HOTEL, HOTEL};
+    std::vector<Graph<char>> graphs = {graph};
+    menu::menuLoop(graphs, pois, cat);
+    /*srand (static_cast <unsigned> (time(0)));
     benchmarkCCTSP();
     auto i = randomMatrix(0, 100, 0, 100, 50, 50);
     srand(time(nullptr));
@@ -142,7 +150,7 @@ int main() {
 
     vector<float> a = {0, 1, 3, 4, 2};
     auto aa = branchAndBound(getArticleMatrix(), a, 12);
-    auto aaa = nearestNeighbour(getArticleMatrix(), a, 12);
+    auto aaa = nearestNeighbour(getArticleMatrix(), a, 12);*/
 
     // PARSING RELATED CODE
     /*
