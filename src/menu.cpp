@@ -66,19 +66,34 @@ float menu::getFloatValue() {
 }
 
 
+void menu::menuLoop() {
+    std::vector<float> preferences = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    MAP map = PORTO;
+    REDUCTION_STEP_ALGORITHM reductionStepAlgorithm = DIJKSTRA;
+    CCTSP_STEP_ALGORITHM cctspStepAlgorithm = BRANCH_AND_BOUND;
 
-float menu::getBudget() {
-    optionsMenu("Select Budget", {}, menu::NONE);
-    float answer = getFloatValue();
-    return answer;
-}
-
-std::vector<float> menu::calculateScores(const std::vector<POICategory> & pointsOfInterestCategories, const std::vector<float> preferences) {
-    std::vector<float> scores;
-    for (POICategory category : pointsOfInterestCategories) {
-        scores.push_back(preferences[category]);
+    MENU_TYPE menu = MAIN_MENU;
+    while (menu != EXIT_MENU) {
+        switch (menu) {
+            case MAIN_MENU:
+                menu = menu::mainMenu();
+                break;
+            case CALCULATE_TRIP_MENU:
+                menu = menu::calculateTripMenu(preferences, reductionStepAlgorithm, cctspStepAlgorithm, map);
+                break;
+            case MAP_MENU:
+                menu = menu::mapsMenu(map);
+                break;
+            case ALGORITHM_MENU:
+                menu = menu::algorithmsMenu(reductionStepAlgorithm, cctspStepAlgorithm);
+                break;
+            case PREFERENCES_MENU:
+                menu = menu::preferencesMenu(preferences);
+                break;
+            default:
+                break;
+        }
     }
-    return scores;
 }
 
 
@@ -161,4 +176,19 @@ MENU_TYPE menu::algorithmsMenu(REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm
             return MAIN_MENU;
     }
     return MAIN_MENU;
+}
+
+
+float menu::getBudget() {
+    optionsMenu("Select Budget", {}, menu::NONE);
+    float answer = getFloatValue();
+    return answer;
+}
+
+std::vector<float> menu::calculateScores(const std::vector<POICategory> & pointsOfInterestCategories, const std::vector<float> preferences) {
+    std::vector<float> scores;
+    for (POICategory category : pointsOfInterestCategories) {
+        scores.push_back(preferences[category]);
+    }
+    return scores;
 }

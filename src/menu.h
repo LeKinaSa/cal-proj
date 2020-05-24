@@ -44,13 +44,12 @@ namespace menu {
         NONE
     };
 
-    template <class T>
-    void menuLoop(const std::vector<Graph<T>> & graphs, const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories);
+    void menuLoop();
+
     int optionsMenu(const std::string & title, const std::vector<std::string> & options, OPTION option);
     float getFloatValue();
 
     MENU_TYPE mainMenu();
-    template <class T>
     MENU_TYPE calculateTripMenu(std::vector<float> preferences, REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map);
     MENU_TYPE mapsMenu(MAP & map);
     MENU_TYPE algorithmsMenu(REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm);
@@ -158,8 +157,10 @@ void menu::showPath(const std::vector<Vertex<T>*> & path) {
 
 template<class T>
 MENU_TYPE menu::calculateTripMenu(std::vector<float> preferences, REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map) {
-
     Graph<T> graph;
+    std::vector<Vertex<T>*> pointsOfInterest;
+    std::vector<POICategory> pointsOfInterestCategories;
+
     std::string vertexPath;
     std::string edgePath;
     std::string tagsPath;
@@ -172,7 +173,7 @@ MENU_TYPE menu::calculateTripMenu(std::vector<float> preferences, REDUCTION_STEP
 
     parseVertexFile(vertexPath, graph);
     parseEdgeFile(edgePath, graph);
-    parseTagsFile(tagsPath, graph, pointsOfInterest, pointsOfInterestCategories);
+    parseTagsFile(tagsPath, graph, pointsOfInterest, pointsOfInterestCategories); //TODO
 
     T start = menu::selectStart(graph);
     T finish = menu::selectFinish(graph);
@@ -184,38 +185,6 @@ MENU_TYPE menu::calculateTripMenu(std::vector<float> preferences, REDUCTION_STEP
     optionsMenu("", {}, BACK);
     return MAIN_MENU;
 }
-
-template <class T>
-void menu::menuLoop() {
-    std::vector<float> preferences = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    MAP map = PORTO;
-    REDUCTION_STEP_ALGORITHM reductionStepAlgorithm = DIJKSTRA;
-    CCTSP_STEP_ALGORITHM cctspStepAlgorithm = BRANCH_AND_BOUND;
-
-    MENU_TYPE menu = MAIN_MENU;
-    while (menu != EXIT_MENU) {
-        switch (menu) {
-            case MAIN_MENU:
-                menu = menu::mainMenu();
-                break;
-            case CALCULATE_TRIP_MENU:
-                menu = menu::calculateTripMenu(preferences, reductionStepAlgorithm, cctspStepAlgorithm, map);
-                break;
-            case MAP_MENU:
-                menu = menu::mapsMenu(map);
-                break;
-            case ALGORITHM_MENU:
-                menu = menu::algorithmsMenu(reductionStepAlgorithm, cctspStepAlgorithm);
-                break;
-            case PREFERENCES_MENU:
-                menu = menu::preferencesMenu(preferences);
-                break;
-            default:
-                break;
-        }
-    }
-}
-
 
 
 #endif //CAL_PROJ_MENU_H
