@@ -82,7 +82,7 @@ std::vector<float> menu::calculateScores(const std::vector<POICategory> & points
 }
 
 
-MENU_TYPE menu::mainMenu() {
+MenuType menu::mainMenu() {
     int answer = optionsMenu("Main Menu", { "Calculate Trip", "Select Map", "Select Algorithm", "Select Preferences" }, menu::EXIT);
     switch (answer) {
         case 0:
@@ -100,7 +100,7 @@ MENU_TYPE menu::mainMenu() {
     }
 }
 
-MENU_TYPE menu::mapsMenu(MAP & map) {
+MenuType menu::mapsMenu(MAP & map) {
     const std::vector<std::string> maps = {"Porto"}; //TODO
     int answer = optionsMenu("Select Map", maps, menu::BACK);
     switch (answer) {
@@ -115,7 +115,7 @@ MENU_TYPE menu::mapsMenu(MAP & map) {
     return MAIN_MENU;
 }
 
-MENU_TYPE menu::preferencesMenu(std::vector<float> & preferences) {
+MenuType menu::preferencesMenu(std::vector<float> & preferences) {
     const std::vector<std::string> interestPointsCategories = { "Information", "Hotel", "Attraction", "Viewpoint",
                                                                 "Guest House", "Picnic Site","Artwork", "Camp Site",
                                                                 "Museum" };
@@ -133,7 +133,7 @@ MENU_TYPE menu::preferencesMenu(std::vector<float> & preferences) {
     return MAIN_MENU;
 }
 
-MENU_TYPE menu::algorithmsMenu(REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm) {
+MenuType menu::algorithmsMenu(ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm) {
     int answer = optionsMenu("Select the Reduction Step Algorithm", {"Dijkstra", "Floyd-Warshall"}, menu::BACK);
     switch (answer) {
         case 0:
@@ -161,4 +161,40 @@ MENU_TYPE menu::algorithmsMenu(REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm
             return MAIN_MENU;
     }
     return MAIN_MENU;
+}
+
+void menu::showPathOnGraphViewer(const std::vector<Vertex<char>*> & path) {
+    GraphViewer *gv = new GraphViewer(600, 600, true);
+    gv->createWindow(600, 600);
+    gv->defineVertexColor("grey");
+    gv->defineEdgeColor("black");
+
+    if (!path.empty()) {
+        gv->addNode(path[0]->getInfo());
+    }
+
+    for (int index = 1; index < path.size(); ++index) {
+        gv->addNode(path[index]->getInfo());
+        gv->addEdge(index - 1, path[index - 1]->getInfo(), path[index]->getInfo(), EdgeType::DIRECTED);
+    }
+
+    gv->rearrange();
+}
+
+void menu::showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path) {
+    GraphViewer *gv = new GraphViewer(600, 600, false);
+    gv->createWindow(600, 600);
+    gv->defineVertexColor("grey");
+    gv->defineEdgeColor("black");
+
+    if (!path.empty()) {
+        gv->addNode(path[0]->getInfo().getId(), path[0]->getInfo().getLatitude(), path[0]->getInfo().getLongitude());
+    }
+
+    for (int index = 1; index < path.size(); ++ index) {
+        gv->addNode(path[index]->getInfo().getId(), path[index]->getInfo().getLatitude(), path[index]->getInfo().getLongitude());
+        gv->addEdge(index - 1, path[index - 1]->getInfo().getId(), path[index]->getInfo().getId(), EdgeType::DIRECTED);
+    }
+
+    gv->rearrange();
 }

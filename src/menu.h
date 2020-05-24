@@ -1,9 +1,5 @@
-//
-// Created by C Martins on 24/05/2020.
-//
-
-#ifndef CAL_PROJ_MENU_H
-#define CAL_PROJ_MENU_H
+#ifndef MENU_H
+#define MENU_H
 
 #include "Graph.h"
 #include "parsing.h"
@@ -14,7 +10,7 @@
 #include <string>
 #include <vector>
 
-enum MENU_TYPE {
+enum MenuType {
     MAIN_MENU,
     CALCULATE_TRIP_MENU,
     MAP_MENU,
@@ -22,15 +18,18 @@ enum MENU_TYPE {
     PREFERENCES_MENU,
     EXIT_MENU
 };
+
 enum MAP {
     PORTO,
     AVEIRO
 };
-enum REDUCTION_STEP_ALGORITHM {
+
+enum ReductionStepAlgorithm {
     DIJKSTRA,
     FLOYD_WARSHALL
 };
-enum CCTSP_STEP_ALGORITHM {
+
+enum CCTSPStepAlgorithm {
     BRANCH_AND_BOUND,
     NEAREST_NEIGHBOUR
 };
@@ -50,14 +49,14 @@ namespace menu {
     int optionsMenu(const std::string & title, const std::vector<std::string> & options, OPTION option);
     float getFloatValue();
 
-    MENU_TYPE mainMenu();
+    MenuType mainMenu();
     template <class T>
-    MENU_TYPE calculateTripMenu(const std::vector<Graph<T>> & graph, std::vector<float> preferences,
-                                const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
-                                REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map);
-    MENU_TYPE mapsMenu(MAP & map);
-    MENU_TYPE algorithmsMenu(REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm);
-    MENU_TYPE preferencesMenu(std::vector<float> & preferences);
+    MenuType calculateTripMenu(const std::vector<Graph<T>> & graph, std::vector<float> preferences,
+                               const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
+                               ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm, MAP & map);
+    MenuType mapsMenu(MAP & map);
+    MenuType algorithmsMenu(ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm);
+    MenuType preferencesMenu(std::vector<float> & preferences);
 
     template <class T>
     std::vector<Vertex<T>*> mmpMethod(
@@ -67,15 +66,15 @@ namespace menu {
             const T& start,
             const T& finish,
             float budget,
-            const REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm,
-            const CCTSP_STEP_ALGORITHM & cctspStepAlgorithm
+            const ReductionStepAlgorithm & reductionStepAlgorithm,
+            const CCTSPStepAlgorithm & cctspStepAlgorithm
     );
 
     template <class T>
     void showPath(const std::vector<Vertex<T>*> & path);
-    template <class T>
-    void showPathOnGraphViewer(const std::vector<Vertex<T>*> & path);
-    void showPathOnGraphViewer(const vector<Vertex<VertexInfo>*> & path);
+
+    void showPathOnGraphViewer(const std::vector<Vertex<char>*> & path);
+    void showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path);
 
     template <class T>
     T selectStart(const Graph<T> & graph);
@@ -94,8 +93,8 @@ std::vector<Vertex<T>*> menu::mmpMethod(
         const T& start,
         const T& finish,
         float budget,
-        const REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm,
-        const CCTSP_STEP_ALGORITHM & cctspStepAlgorithm
+        const ReductionStepAlgorithm & reductionStepAlgorithm,
+        const CCTSPStepAlgorithm & cctspStepAlgorithm
 ) {
     graph.dijkstraShortestPath(start);
 
@@ -162,45 +161,10 @@ void menu::showPath(const std::vector<Vertex<T>*> & path) {
     std::cout << std::endl;
 }
 
-template <class T>
-void menu::showPathOnGraphViewer(const std::vector<Vertex<T>*> & path) {
-    GraphViewer *gv = new GraphViewer(600, 600, true);
-    gv->createWindow(600, 600);
-    gv->defineVertexColor("grey");
-    gv->defineEdgeColor("black");
-
-    if (path.size() > 0) {
-        gv->addNode(path[0]->getInfo());
-    }
-
-    for (int index = 1; index < path.size(); ++index) {
-        gv->addNode(path[index]->getInfo());
-        gv->addEdge(index - 1, path[index - 1]->getInfo(), path[index]->getInfo(), EdgeType::DIRECTED);
-    }
-    gv->rearrange();
-}
-
-void menu::showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path) {
-    GraphViewer *gv = new GraphViewer(600, 600, false);
-    gv->createWindow(600, 600);
-    gv->defineVertexColor("grey");
-    gv->defineEdgeColor("black");
-
-    if (path.size() > 0) {
-        gv->addNode(path[0]->getInfo().getId(), path[0]->getInfo().getLatitude(), path[0]->getInfo().getLongitude());
-    }
-
-    for (int index = 1; index < path.size(); ++ index) {
-        gv->addNode(path[index]->getInfo().getId(), path[index]->getInfo().getLatitude(), path[index]->getInfo().getLongitude());
-        gv->addEdge(index - 1, path[index - 1]->getInfo().getId(), path[index]->getInfo().getId(), EdgeType::DIRECTED);
-    }
-    gv->rearrange();
-}
-
 template<class T>
-MENU_TYPE menu::calculateTripMenu(const std::vector<Graph<T>> & graphs, std::vector<float> preferences,
-                            const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
-                            REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map) {
+MenuType menu::calculateTripMenu(const std::vector<Graph<T>> & graphs, std::vector<float> preferences,
+                                 const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories,
+                                 ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm, MAP & map) {
 
     Graph<T> graph = graphs[map];
     T start, finish;
@@ -209,7 +173,7 @@ MENU_TYPE menu::calculateTripMenu(const std::vector<Graph<T>> & graphs, std::vec
         start = menu::selectStart(graph);
         finish = menu::selectFinish(graph);
     }
-    catch (std::out_of_range outOfRange) {
+    catch (const std::out_of_range& outOfRange) {
         return MAIN_MENU;
     }
     float budget = menu::getBudget();
@@ -226,10 +190,10 @@ template <class T>
 void menu::menuLoop(const std::vector<Graph<T>> & graphs, const std::vector<Vertex<T>*> & pointsOfInterest, const std::vector<POICategory> & pointsOfInterestCategories) {
     std::vector<float> preferences = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     MAP map = PORTO;
-    REDUCTION_STEP_ALGORITHM reductionStepAlgorithm = DIJKSTRA;
-    CCTSP_STEP_ALGORITHM cctspStepAlgorithm = BRANCH_AND_BOUND;
+    ReductionStepAlgorithm reductionStepAlgorithm = DIJKSTRA;
+    CCTSPStepAlgorithm cctspStepAlgorithm = BRANCH_AND_BOUND;
 
-    MENU_TYPE menu = MAIN_MENU;
+    MenuType menu = MAIN_MENU;
     while (menu != EXIT_MENU) {
         switch (menu) {
             case MAIN_MENU:
@@ -255,5 +219,4 @@ void menu::menuLoop(const std::vector<Graph<T>> & graphs, const std::vector<Vert
 }
 
 
-
-#endif //CAL_PROJ_MENU_H
+#endif // MENU_H
