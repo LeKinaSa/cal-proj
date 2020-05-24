@@ -148,6 +148,8 @@ std::vector<Vertex<T>*> mmpMethod(
 
 
 int main() {
+    srand(time(nullptr));
+
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;
     std::vector<float> scores;

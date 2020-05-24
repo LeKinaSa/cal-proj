@@ -2,7 +2,7 @@
 // Created by daniel on 22/05/2020.
 //
 
-#include "mockMatrixes.h"
+#include "mockMatrices.h"
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
