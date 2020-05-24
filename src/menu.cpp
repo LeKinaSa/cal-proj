@@ -36,7 +36,7 @@ enum CCTSP_STEP_ALGORITHM {
 int optionsMenu(const std::string & title, const std::vector<std::string> & options, bool exit) {
     if (title != "") {
         std::cout << menu::SEPARATOR << std::endl;
-        std::cout << title << std::endl;
+        std::cout << '\t' << title << std::endl;
     }
     std::cout << menu::SEPARATOR << std::endl;
     for (size_t index = 0; index < options.size(); index ++) {
@@ -70,7 +70,7 @@ int optionsMenu(const std::string & title, const std::vector<std::string> & opti
 
 
 MENU_TYPE mainMenu() {
-    int answer = optionsMenu("Main Menu", {"Calculate Trip", "Select Preferences", "Select Map", "Select Algorithm"}, true);
+    int answer = optionsMenu("Main Menu", {"Calculate Trip", "Select Map", "Select Preferences", "Select Algorithm"}, true);
     switch (answer) {
         case 0:
             return EXIT_MENU;
@@ -89,7 +89,7 @@ MENU_TYPE mainMenu() {
 
 MENU_TYPE calculateTripMenu(REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm, CCTSP_STEP_ALGORITHM & cctspStepAlgorithm, MAP & map) {
     //TODO
-    
+
     int answer = optionsMenu("", {}, false);
     return MAIN_MENU;
 }
@@ -142,21 +142,25 @@ MENU_TYPE mapsMenu(MAP & map) {
     return MAIN_MENU;
 }
 
-MENU_TYPE preferencesMenu(std::vector<int> & preferences) {
+MENU_TYPE preferencesMenu(std::vector<float> & preferences) {
     const std::vector<std::string> interestPointsCategories = { "Information", "Hotel", "Attraction", "Viewpoint",
                                                                 "Guest House", "Picnic Site","Artwork", "Camp Site",
-                                                                "Museum", "Unspecified" };
+                                                                "Museum" };
+
+    std::cout << menu::SEPARATOR << std::endl;
+    std::cout << '\t' << "Select Preferences" << std::endl;
+    std::cout << menu::SEPARATOR << std::endl;
 
     std::string answerStr;
     int answer;
     preferences.clear();
     for (std::string point : interestPointsCategories) {
-        std::cout << " " << point << menu::INPUT;
+        std::cout << " " << point << std::endl;
         while (true) {
             std::cout << menu::INPUT;
             getline(std::cin, answerStr);
             try {
-                answer = stoi(answerStr);
+                answer = stof(answerStr);
             }
             catch (std::exception e) {
                 continue;
@@ -165,17 +169,18 @@ MENU_TYPE preferencesMenu(std::vector<int> & preferences) {
         }
         preferences.push_back(answer);
     }
+    preferences.push_back(1.0);
     return MAIN_MENU;
 }
 
 
 void menu::menuLoop() {
-    std::vector<int> preferences = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    std::vector<float> preferences = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     MAP map = PORTO;
     REDUCTION_STEP_ALGORITHM reductionStepAlgorithm = DIJKSTRA;
     CCTSP_STEP_ALGORITHM cctspStepAlgorithm = BRANCH_AND_BOUND;
 
-    MENU_TYPE menu;
+    MENU_TYPE menu = MAIN_MENU;
     while (menu != EXIT_MENU) {
         switch (menu) {
             case MAIN_MENU:
