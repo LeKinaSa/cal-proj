@@ -2,11 +2,25 @@
 // Created by daniel on 17/05/2020.
 //
 
+#include <iostream>
 #include "nearestNeighbour.h"
 using namespace std;
 
 std::vector<int>
 nearestNeighbour(const std::vector<std::vector<float>> &adjMatrix, const std::vector<float> &scores, float budget) {
+    int mSize = adjMatrix.size();
+    if (scores.size() != mSize - 1) {
+        cerr << "Invalid args" << endl;
+        exit(1);
+    }
+    for (const vector<float> &i : adjMatrix) {
+        if (i.size() != mSize) {
+            cerr << "Invalid args" << endl;
+            exit(1);
+        }
+    }
+
+
     vector<int> path;
     vector<int> unusedVertices;
     float pathCost = 0;
@@ -31,7 +45,7 @@ nearestNeighbour(const std::vector<std::vector<float>> &adjMatrix, const std::ve
             float newCost = pathCost - adjMatrix[lastPathIndex][0]
                             + adjMatrix[lastPathIndex][index] + adjMatrix[index][0];
 
-            float ratio = scores[index] / adjMatrix[lastPathIndex][index];
+            float ratio = scores[index - 1] / adjMatrix[lastPathIndex][index];
 
             if (newCost <= budget && ratio > bestRatio) {
                 bestRatio = ratio;
@@ -48,7 +62,7 @@ nearestNeighbour(const std::vector<std::vector<float>> &adjMatrix, const std::ve
             float newCost = pathCost - adjMatrix[lastPathIndex][0]
                             + adjMatrix[lastPathIndex][index] + adjMatrix[index][0];
 
-            float newScore = score + scores[index];
+            float newScore = score + scores[index - 1];
 
             pathCost = newCost;
             score    = newScore;
