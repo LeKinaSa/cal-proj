@@ -1,13 +1,74 @@
 #include "Graph.h"
 #include "parsing.h"
+#include "branchAndBound.h"
+#include "nearestNeighbour.h"
 
 #include <vector>
 #include <ctime>
 #include <cstdlib>
-#include "mockMatrixes.h"
+#include "mockMatrices.h"
 #include "CCTSPbenchmark.h"
+#include <iostream>
 
 using namespace std;
+
+vector<vector<float>> getArticleMatrix () {
+    vector<vector<float>> res(5 , vector<float>());
+    res[0] = {0, 3,  6, 8, 11};
+    res[1] = {12, 0,  9, 10, 10};
+    res[2] = {6, 10, 0, 4, 7};
+    res[3] = {2, 10, 5, 0, 3};
+    res[4] = {2, 8,  8, 3, 0};
+
+    return res;
+}
+
+/** Reconstructs the full path from the cost-constrained TSP path. */
+template<class T>
+std::vector<Vertex<T>*> reconstructPath(Graph<T>& graph, T start, T finish,
+        const std::vector<std::vector<float>>& adjMatrix, const std::vector<Vertex<T>*>& pointsOfInterest,
+        const std::vector<int>& tspPath) {
+
+    std::vector<Vertex<T>*> path, pathFragment;
+    path.push_back(graph.findVertex(start));
+
+    graph.dijkstraShortestPath(start);
+
+    for (int i = 1; i < tspPath.size(); ++i) {
+        int idx = tspPath.at(i);
+
+        Vertex<T>* poi = pointsOfInterest.at(idx - 1);
+        Vertex<T>* v = poi;
+
+        pathFragment.clear();
+
+        do {
+            // We insert at the beginning to invert the order of the vertices
+            pathFragment.insert(pathFragment.begin(), v);
+
+            v = v->getPath();
+        } while (v->getPath() != nullptr);
+
+        path.insert(path.end(), pathFragment.begin(), pathFragment.end());
+
+        graph.dijkstraShortestPath(poi->getInfo());
+    }
+
+    pathFragment.clear();
+    Vertex<T>* finishPtr = graph.findVertex(finish);
+
+    do {
+        // We insert at the beginning to invert the order of the vertices
+        pathFragment.insert(pathFragment.begin(), finishPtr);
+
+        finishPtr = finishPtr->getPath();
+    } while (finishPtr->getPath() != nullptr);
+
+
+    path.insert(path.end(), pathFragment.begin(), pathFragment.end());
+
+    return path;
+}
 
 
 void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInterest, std::vector<float>& scores) {
@@ -52,9 +113,9 @@ void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInt
     pointsOfInterest.push_back(graph.findVertex('h'));
 
     scores.push_back(1.0);
-    scores.push_back(2.0);
     scores.push_back(3.0);
     scores.push_back(4.0);
+    scores.push_back(2.0);
 }
 
 
@@ -66,7 +127,7 @@ std::vector<Vertex<T>*> mmpMethod(
         const T& start,
         const T& finish,
         float budget
-        ) {
+) {
     graph.dijkstraShortestPath(start);
 
     Vertex<T>* finishPtr = graph.findVertex(finish);
@@ -81,21 +142,12 @@ std::vector<Vertex<T>*> mmpMethod(
         return std::vector<Vertex<T>*>();
     }
 
-    Vertex<T> * startPtr = graph.findVertex(start);
+    Vertex<T>* startPtr = graph.findVertex(start);
     std::vector<std::vector<float>> adj = graph.generateAdjacencyMatrixWithDijkstra(pointsOfInterest, startPtr, finishPtr);
 
-    return std::vector<Vertex<T>*>();
-}
+    std::vector<int> tspPath = nearestNeighbour(adj, scores, budget);
 
-vector<vector<float>> getArticleMatrix () {
-    vector<vector<float>> res(5 , vector<float>());
-    res[0] = {0, 3,  6, 8, 11};
-    res[1] = {3, 0,  6, 9, 10};
-    res[2] = {6, 10, 0, 4, 7};
-    res[3] = {2, 10, 5, 0, 3};
-    res[4] = {2, 8,  8, 3, 0};
-
-    return res;
+    return reconstructPath(graph, start, finish, adj, pointsOfInterest, tspPath);
 }
 
 
@@ -103,18 +155,27 @@ int main() {
     srand (static_cast <unsigned> (time(0)));
     benchmarkCCTSP();
     auto i = randomMatrix(0, 100, 0, 100, 50, 50);
+    srand(time(nullptr));
+
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;
     std::vector<float> scores;
 
-    /*
     initReportGraph(graph, pointsOfInterest, scores);
-    mmpMethod(graph, pointsOfInterest, scores, 's', 'f', 1000);
+    std::vector<Vertex<char>*> path = mmpMethod(graph, pointsOfInterest, scores, 's', 'f', 12);
+
+    for (Vertex<char>* v : path) {
+        std::cout << v->getInfo() << " ";
+    }
+
+    std::cout << std::endl;
 
     vector<float> a = {0, 1, 3, 4, 2};
     auto aa = branchAndBound(getArticleMatrix(), a, 12);
-    auto aaa = nearestNeighbour(getArticleMatrix(), a, 12);*/
+    auto aaa = nearestNeighbour(getArticleMatrix(), a, 12);
 
+    // PARSING RELATED CODE
+    /*
     Graph<VertexInfo> graph1;
     std::vector<Vertex<VertexInfo>*> pointsOfInterest1;
     std::vector<float> scores1;
@@ -135,6 +196,7 @@ int main() {
     parseVertexFile("nodes_lat_lon_porto.txt", graph1);
     parseEdgeFile("edges_porto.txt", graph1);
     parseTagsFile("t03_tags_porto.txt", graph1, pointsOfInterest1, scores1, userPreferences);
+    */
 
     return 0;
 }
