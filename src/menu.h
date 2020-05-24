@@ -5,7 +5,6 @@
 #include "parsing.h"
 #include "branchAndBound.h"
 #include "nearestNeighbour.h"
-#include "graph_viewer/graphviewer.h"
 
 #include <string>
 #include <vector>
@@ -52,7 +51,8 @@ namespace menu {
 
     MenuType mainMenu();
     MenuType calculateTripMenu(const std::vector<float>& preferences,
-            ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm, CityMap & map);
+            const ReductionStepAlgorithm & reductionStepAlgorithm, const CCTSPStepAlgorithm & cctspStepAlgorithm,
+            const CityMap & map);
     MenuType mapsMenu(CityMap & map);
     MenuType algorithmsMenu(ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm);
     MenuType preferencesMenu(std::vector<float> & preferences);
@@ -137,6 +137,7 @@ std::vector<Vertex<T>*> mmpMethod(
     // Check if there is a solution (a path from start to finish with cost no greater than budget)
     if (finishPtr != nullptr) {
         if (finishPtr->getDist() > budget) {
+            std::cout << "There isn't a path from start to finish with cost no greater than the budget." << std::endl;
             return std::vector<Vertex<T> *>();
         }
     }
@@ -176,9 +177,12 @@ std::vector<Vertex<T>*> mmpMethod(
 template <class T>
 void menu::showPath(const std::vector<Vertex<T>*> & path) {
     menu::optionsMenu("Best Path", {}, menu::NONE);
-    std::cout << (path[0])->getInfo();
-    for (int index = 1; index < path.size(); ++ index) {
-        std::cout << " - " << (path[index])->getInfo();
+
+    for (int index = 0; index < path.size(); ++index) {
+        if (index > 0) {
+            std::cout << " - ";
+        }
+        std::cout << path[index]->getInfo();
     }
     std::cout << std::endl;
 }

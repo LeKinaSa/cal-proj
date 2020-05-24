@@ -1,8 +1,5 @@
-//
-// Created by C Martins on 24/05/2020.
-//
-
 #include "menu.h"
+#include "../lib/graphviewer.h"
 
 #include <iostream>
 
@@ -172,13 +169,22 @@ void menu::showPathOnGraphViewer(const std::vector<Vertex<char>*> & path) {
     gv->defineVertexColor("grey");
     gv->defineEdgeColor("black");
 
+    char c;
+
     if (!path.empty()) {
-        gv->addNode(path[0]->getInfo());
+        c = path[0]->getInfo();
+
+        gv->addNode(c);
+        gv->setVertexLabel(c, std::string(1, c));
     }
 
     for (int index = 1; index < path.size(); ++index) {
-        gv->addNode(path[index]->getInfo());
-        gv->addEdge(index - 1, path[index - 1]->getInfo(), path[index]->getInfo(), EdgeType::DIRECTED);
+        c = path[index]->getInfo();
+
+        gv->addNode(c);
+        gv->setVertexLabel(c, std::string(1, c));
+
+        gv->addEdge(index - 1, path[index - 1]->getInfo(), c, EdgeType::DIRECTED);
     }
 
     gv->rearrange();
@@ -206,10 +212,10 @@ void menu::showPathOnGraphViewer(const std::vector<Vertex<VertexInfo>*> & path) 
 unsigned int menu::selectVertex(const Graph<VertexInfo>& graph) {
     std::cout << "Enter a vertex id between 0 and " << graph.getVertexSet().size() - 1 << std::endl;
 
-    unsigned int answer;
-    cin >> answer;
+    std::string answer;
+    getline(std::cin, answer);
 
-    return answer;
+    return stoul(answer);
 }
 
 
@@ -291,52 +297,51 @@ void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInt
 }
 
 MenuType menu::calculateTripMenu(const std::vector<float>& preferences,
-                                 ReductionStepAlgorithm & reductionStepAlgorithm, CCTSPStepAlgorithm & cctspStepAlgorithm, CityMap & map) {
+                                 const ReductionStepAlgorithm & reductionStepAlgorithm,
+                                 const CCTSPStepAlgorithm & cctspStepAlgorithm, const CityMap & map) {
 
-    switch (map) {
-        case REPORT: {
-            Graph<char> graph;
-            std::vector<Vertex<char>*> pointsOfInterest;
-            std::vector<float> scores;
+    if (map == REPORT) {
+        Graph<char> graph;
+        std::vector<Vertex<char>*> pointsOfInterest;
+        std::vector<float> scores;
 
-            initReportGraph(graph, pointsOfInterest, scores);
+        initReportGraph(graph, pointsOfInterest, scores);
 
-            std::vector<Vertex<char>*> path = mmpMethod(graph, pointsOfInterest, scores, 's', 'f',
-                    12, reductionStepAlgorithm, cctspStepAlgorithm);
+        std::vector<Vertex<char>*> path = mmpMethod(graph, pointsOfInterest, scores, 's', 'f',
+                                                    12, reductionStepAlgorithm, cctspStepAlgorithm);
 
-            
+        showPath(path);
 
-            break;
-        }
-        case GRID_4X4:
-        case GRID_8X8:
-        case GRID_16X16: {
-            Graph<VertexInfo> graph;
-            std::vector<Vertex<VertexInfo>*> pointsOfInterest;
-            std::vector<POICategory> categories;
+        // showPathOnGraphViewer(path);
+    }
+    else {
+        Graph<VertexInfo> graph;
+        std::vector<Vertex<VertexInfo>*> pointsOfInterest;
+        std::vector<POICategory> categories;
 
-            std::string filePath;
+        std::string filePath;
 
-            if (map == GRID_4X4) filePath = "maps/4x4/";
-            else if (map == GRID_8X8) filePath = "maps/8x8/";
-            else filePath = "maps/16x16";
+        if (map == GRID_4X4) filePath = "maps/4x4/";
+        else if (map == GRID_8X8) filePath = "maps/8x8/";
+        else filePath = "maps/16x16";
 
-            parseVertexFile(filePath + "nodes.txt", graph);
-            parseEdgeFile(filePath + "edges.txt", graph);
-            parseTagsFile(filePath + "tags.txt", graph, pointsOfInterest, categories);
+        parseVertexFile(filePath + "nodes.txt", graph);
+        parseEdgeFile(filePath + "edges.txt", graph, false);
+        parseTagsFile(filePath + "tags.txt", graph, pointsOfInterest, categories);
 
-            std::vector<float> scores = calculateScores(categories, preferences);
+        std::vector<float> scores = calculateScores(categories, preferences);
 
-            unsigned int start = selectVertex(graph);
-            unsigned int finish = selectVertex(graph);
+        unsigned int start = selectVertex(graph);
+        unsigned int finish = selectVertex(graph);
 
-            float budget = getBudget();
+        float budget = getBudget();
 
-            std::vector<Vertex<VertexInfo>*> path = mmpMethod(graph, pointsOfInterest, scores,
-                    VertexInfo(start), VertexInfo(finish), budget, reductionStepAlgorithm, cctspStepAlgorithm);
+        std::vector<Vertex<VertexInfo>*> path = mmpMethod(graph, pointsOfInterest, scores,
+                VertexInfo(start), VertexInfo(finish), budget, reductionStepAlgorithm, cctspStepAlgorithm);
 
-            break;
-        }
+        showPath(path);
+
+        // showPathOnGraphViewer(path);
     }
 
     optionsMenu("", {}, BACK);

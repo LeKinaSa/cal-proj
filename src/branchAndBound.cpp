@@ -71,6 +71,14 @@ public:
     const vector<int> &getPath() const {
         return path;
     }
+
+    float getScore() const {
+        return score;
+    }
+
+    float getCost() const {
+        return pathCost;
+    }
 };
 
 vector<int>
@@ -108,6 +116,8 @@ branchAndBound(const vector<vector<float>> &adjMatrix, const vector<float> &scor
             solutions.push(std::move(child));
         }
     }
+
+    cout << "Path score: " << currentBest.getScore() << " | Path cost: " << currentBest.getCost() << endl;
 
     return currentBest.getPath();
 }

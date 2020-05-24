@@ -74,7 +74,7 @@ void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph, bool haver
         float dist = haversine ? haversineDistance(sourcePtr->getInfo(), destPtr->getInfo()) :
                 euclideanDistance(sourcePtr->getInfo(), destPtr->getInfo());
 
-        graph.addEdge(idSource, idDest, haversineDistance(sourcePtr->getInfo(), destPtr->getInfo()));
+        graph.addEdge(idSource, idDest, dist);
     }
 
     ifs.close();
