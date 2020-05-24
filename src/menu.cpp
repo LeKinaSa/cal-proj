@@ -66,24 +66,6 @@ float menu::getFloatValue() {
 }
 
 
-MENU_TYPE menu::mainMenu() {
-    int answer = optionsMenu("Main Menu", {"Calculate Trip", "Select Map", "Select Preferences", "Select Algorithm"}, menu::EXIT);
-    switch (answer) {
-        case 0:
-            return EXIT_MENU;
-        case 1:
-            return CALCULATE_TRIP_MENU;
-        case 2:
-            return MAP_MENU;
-        case 3:
-            return PREFERENCES_MENU;
-        case 4:
-            return ALGORITHM_MENU;
-        default:
-            return MAIN_MENU;
-    }
-}
-
 
 float menu::getBudget() {
     optionsMenu("Select Budget", {}, menu::NONE);
@@ -100,6 +82,24 @@ std::vector<float> menu::calculateScores(const std::vector<POICategory> & points
 }
 
 
+MENU_TYPE menu::mainMenu() {
+    int answer = optionsMenu("Main Menu", { "Calculate Trip", "Select Map", "Select Algorithm", "Select Preferences" }, menu::EXIT);
+    switch (answer) {
+        case 0:
+            return EXIT_MENU;
+        case 1:
+            return CALCULATE_TRIP_MENU;
+        case 2:
+            return MAP_MENU;
+        case 3:
+            return ALGORITHM_MENU;
+        case 4:
+            return PREFERENCES_MENU;
+        default:
+            return MAIN_MENU;
+    }
+}
+
 MENU_TYPE menu::mapsMenu(MAP & map) {
     const std::vector<std::string> maps = {"Porto"}; //TODO
     int answer = optionsMenu("Select Map", maps, menu::BACK);
@@ -112,6 +112,24 @@ MENU_TYPE menu::mapsMenu(MAP & map) {
         default:
             break;
     }
+    return MAIN_MENU;
+}
+
+MENU_TYPE menu::preferencesMenu(std::vector<float> & preferences) {
+    const std::vector<std::string> interestPointsCategories = { "Information", "Hotel", "Attraction", "Viewpoint",
+                                                                "Guest House", "Picnic Site","Artwork", "Camp Site",
+                                                                "Museum" };
+
+    optionsMenu("Select Preferences", {}, menu::NONE);
+
+    float answer;
+    preferences.clear();
+    for (std::string point : interestPointsCategories) {
+        std::cout << " " << point << std::endl;
+        answer = getFloatValue();
+        preferences.push_back(answer);
+    }
+    preferences.push_back(1.0);
     return MAIN_MENU;
 }
 
@@ -144,22 +162,3 @@ MENU_TYPE menu::algorithmsMenu(REDUCTION_STEP_ALGORITHM & reductionStepAlgorithm
     }
     return MAIN_MENU;
 }
-
-MENU_TYPE menu::preferencesMenu(std::vector<float> & preferences) {
-    const std::vector<std::string> interestPointsCategories = { "Information", "Hotel", "Attraction", "Viewpoint",
-                                                                "Guest House", "Picnic Site","Artwork", "Camp Site",
-                                                                "Museum" };
-
-    optionsMenu("Select Preferences", {}, menu::NONE);
-
-    float answer;
-    preferences.clear();
-    for (std::string point : interestPointsCategories) {
-        std::cout << " " << point << std::endl;
-        answer = getFloatValue();
-        preferences.push_back(answer);
-    }
-    preferences.push_back(1.0);
-    return MAIN_MENU;
-}
-

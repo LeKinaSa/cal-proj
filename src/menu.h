@@ -82,7 +82,6 @@ namespace menu {
 }
 
 
-
 template<class T>
 std::vector<Vertex<T>*> menu::mmpMethod(
         Graph<T> & graph,

@@ -113,11 +113,11 @@ public:
     bool addEdge(const T& source, const T& dest, float weight);
 
     void dijkstraShortestPath(const T& source);
-    void floydWarshallShortestPath(std::vector<std::vector<double>> & weight, std::vector<std::vector<int>> & path);
-    std::vector<std::vector<double>> initializeFloydWarshallWeightVector();
+    void floydWarshallShortestPath(std::vector<std::vector<float>> & weight, std::vector<std::vector<int>> & path);
+    std::vector<std::vector<float>> initializeFloydWarshallWeightVector();
     std::vector<std::vector< int  >> initializeFloydWarshallPathVector();
 
-    std::vector<std::vector<double>> generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
+    std::vector<std::vector<float>> generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
 
     std::vector<std::vector<float>> generateAdjacencyMatrixWithDijkstra(
             const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish);
@@ -234,7 +234,7 @@ void Graph<T>::dijkstraShortestPath(const T& source) {
 }
 
 template<class T>
-void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<double>> & weight, std::vector<std::vector<int>> & path) {
+void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<float>> & weight, std::vector<std::vector<int>> & path) {
     unsigned n = vertexSet.size();
 
     for (unsigned i = 0; i < n; i++) {
@@ -248,7 +248,7 @@ void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<double>> & weig
     for (unsigned k = 0; k < n; k++) {
         for (unsigned i = 0; i < n; i++) {
             for (unsigned j = 0; j < n; j++) {
-                if (weight[i][k] == MAX_DOUBLE || weight[k][j] == MAX_DOUBLE)
+                if (weight[i][k] == MAX_FLOAT || weight[k][j] == MAX_FLOAT)
                     continue; // avoid overflow
                 int val = weight[i][k] + weight[k][j];
                 if (val < weight[i][j]) {
@@ -261,15 +261,15 @@ void Graph<T>::floydWarshallShortestPath(std::vector<std::vector<double>> & weig
 }
 
 template<class T>
-std::vector<std::vector<double>> Graph<T>::initializeFloydWarshallWeightVector() {
-    std::vector<std::vector<double>> weight;
-    std::vector<double> aux;
+std::vector<std::vector<float>> Graph<T>::initializeFloydWarshallWeightVector() {
+    std::vector<std::vector<float>> weight;
+    std::vector<float> aux;
     for (int i = 0; i < vertexSet.size(); ++ i) {
         for (int j = 0; j < vertexSet.size(); ++j) {
             if (i == j) {
                 aux.push_back(0);
             } else {
-                aux.push_back(MAX_DOUBLE);
+                aux.push_back(MAX_FLOAT);
             }
         }
         weight.push_back(aux);
@@ -342,11 +342,11 @@ std::vector<std::vector<float>> Graph<T>::generateAdjacencyMatrixWithDijkstra(
  * @return adjacencyMatrix
  */
 template <class T>
-std::vector<std::vector<double>> Graph<T>::generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
-    std::vector<std::vector<double>> adjacencyMatrix;
-    std::vector<double> aux;
+std::vector<std::vector<float>> Graph<T>::generateAdjacencyMatrixWithFloydWarshall(const std::vector<Vertex<T>*>& pointsOfInterest, Vertex<T> * start, Vertex<T> * finish) {
+    std::vector<std::vector<float>> adjacencyMatrix;
+    std::vector<float> aux;
 
-    std::vector<std::vector<double>> weight = initializeFloydWarshallWeightVector();
+    std::vector<std::vector<float>> weight = initializeFloydWarshallWeightVector();
     std::vector<std::vector< int  >>  path  = initializeFloydWarshallPathVector();
     floydWarshallShortestPath(weight, path);
 
