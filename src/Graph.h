@@ -3,7 +3,9 @@
 
 #include "MutablePriorityQueue.h"
 
+#include <iostream>
 #include <vector>
+#include <string>
 #include <limits>
 
 template<class T> class Edge;
@@ -104,6 +106,7 @@ public:
     ~Graph();
 
     std::vector<Vertex<T>*> getVertexSet() const;
+    std::vector<std::string> getStringList() const;
 
     Vertex<T>* findVertex(const T& info);
     bool addVertex(const T& info);
@@ -127,6 +130,20 @@ Graph<T>::~Graph() {
 template<class T>
 std::vector<Vertex<T>*> Graph<T>::getVertexSet() const {
     return vertexSet;
+}
+
+template <class T>
+std::vector<std::string> Graph<T>::getStringList() const {
+    std::vector<std::string> stringList;
+    std::string answer;
+
+    for (Vertex<T>* vertex : vertexSet) {
+        std::cout << vertex->getInfo() << std::endl;
+        getline(std::cin, answer);
+        stringList.push_back(answer);
+    }
+
+    return stringList;
 }
 
 template<class T>

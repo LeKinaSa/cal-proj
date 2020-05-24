@@ -119,36 +119,6 @@ void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInt
 }
 
 
-template<class T>
-std::vector<Vertex<T>*> mmpMethod(
-        Graph<T>& graph,
-        const std::vector<Vertex<T>*>& pointsOfInterest,
-        const std::vector<float>& scores,
-        const T& start,
-        const T& finish,
-        float budget
-) {
-    graph.dijkstraShortestPath(start);
-
-    Vertex<T>* finishPtr = graph.findVertex(finish);
-
-    // Check if there is a solution (a path from start to finish with cost no greater than budget)
-    if (finishPtr != nullptr) {
-        if (finishPtr->getDist() > budget) {
-            return std::vector<Vertex<T>*>();
-        }
-    }
-    else {
-        return std::vector<Vertex<T>*>();
-    }
-
-    Vertex<T>* startPtr = graph.findVertex(start);
-    std::vector<std::vector<float>> adj = graph.generateAdjacencyMatrixWithDijkstra(pointsOfInterest, startPtr, finishPtr);
-
-    std::vector<int> tspPath = nearestNeighbour(adj, scores, budget);
-
-    return reconstructPath(graph, start, finish, adj, pointsOfInterest, tspPath);
-}
 
 
 int main() {
