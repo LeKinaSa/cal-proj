@@ -44,10 +44,11 @@ std::vector<Vertex<T>*> reconstructPath(Graph<T>& graph, T start, T finish,
 
         do {
             // We insert at the beginning to invert the order of the vertices
-            pathFragment.insert(pathFragment.begin(), v);
+            if (v->getPath() != nullptr)
+                pathFragment.insert(pathFragment.begin(), v);
 
             v = v->getPath();
-        } while (v->getPath() != nullptr);
+        } while (v != nullptr);
 
         path.insert(path.end(), pathFragment.begin(), pathFragment.end());
 
@@ -59,10 +60,11 @@ std::vector<Vertex<T>*> reconstructPath(Graph<T>& graph, T start, T finish,
 
     do {
         // We insert at the beginning to invert the order of the vertices
-        pathFragment.insert(pathFragment.begin(), finishPtr);
+        if (finishPtr->getPath() != nullptr)
+            pathFragment.insert(pathFragment.begin(), finishPtr);
 
         finishPtr = finishPtr->getPath();
-    } while (finishPtr->getPath() != nullptr);
+    } while (finishPtr != nullptr);
 
 
     path.insert(path.end(), pathFragment.begin(), pathFragment.end());
@@ -152,10 +154,8 @@ std::vector<Vertex<T>*> mmpMethod(
 
 
 int main() {
-    srand (static_cast <unsigned> (time(0)));
-    benchmarkCCTSP();
-    auto i = randomMatrix(0, 100, 0, 100, 50, 50);
     srand(time(nullptr));
+    //benchmarkCCTSP();
 
     Graph<char> graph;
     std::vector<Vertex<char>*> pointsOfInterest;
@@ -169,34 +169,6 @@ int main() {
     }
 
     std::cout << std::endl;
-
-    vector<float> a = {0, 1, 3, 4, 2};
-    auto aa = branchAndBound(getArticleMatrix(), a, 12);
-    auto aaa = nearestNeighbour(getArticleMatrix(), a, 12);
-
-    // PARSING RELATED CODE
-    /*
-    Graph<VertexInfo> graph1;
-    std::vector<Vertex<VertexInfo>*> pointsOfInterest1;
-    std::vector<float> scores1;
-
-    std::map<POICategory, float> userPreferences = {
-            {INFORMATION, 1.0},
-            {HOTEL, 1.0},
-            {ATTRACTION, 1.0},
-            {VIEWPOINT, 1.0},
-            {GUEST_HOUSE, 1.0},
-            {PICNIC_SITE, 1.0},
-            {ARTWORK, 1.0},
-            {CAMP_SITE, 1.0},
-            {MUSEUM, 1.0},
-            {UNSPECIFIED, 0.0}
-    };
-
-    parseVertexFile("nodes_lat_lon_porto.txt", graph1);
-    parseEdgeFile("edges_porto.txt", graph1);
-    parseTagsFile("t03_tags_porto.txt", graph1, pointsOfInterest1, scores1, userPreferences);
-    */
 
     return 0;
 }
