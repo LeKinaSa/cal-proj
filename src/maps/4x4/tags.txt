@@ -1,0 +1,14 @@
+4
+tourism=information
+1
+5
+tourism=hotel
+2
+6
+11
+tourism=museum
+1
+9
+tourism=viewpoint
+1
+0

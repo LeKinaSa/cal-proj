@@ -34,9 +34,8 @@ const std::map<std::string, POICategory> categoryStringMap = {
 };
 
 void parseVertexFile(const std::string& path, Graph<VertexInfo>& graph);
-void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph);
+void parseEdgeFile(const std::string& path, Graph<VertexInfo>& graph, bool haversine = true);
 void parseTagsFile(const std::string& path, Graph<VertexInfo>& graph,
-        std::vector<Vertex<VertexInfo>*>& pointsOfInterest,
-        std::vector<float>& scores, const std::map<POICategory, float>& userPreferences);
+        std::vector<Vertex<VertexInfo>*>& pointsOfInterest, std::vector<POICategory>& categories);
 
 #endif // PARSING_H
