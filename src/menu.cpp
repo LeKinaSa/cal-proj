@@ -248,7 +248,7 @@ unsigned int menu::selectVertex(const Graph<PosInfo>& graph) {
             std::cerr << "Invalid unsigned int." << std::endl;
             continue;
         }
-        if ((answer >= 0) && (answer < graph.getVertexSet().size() - 1)) {
+        if ((answer >= 0) && (answer < graph.getVertexSet().size())) {
             break;
         }
     }
