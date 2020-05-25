@@ -346,7 +346,7 @@ MenuType menu::calculateTripMenu(const std::vector<float>& preferences,
 
         if (map == GRID_4X4) filePath = "maps/4x4/";
         else if (map == GRID_8X8) filePath = "maps/8x8/";
-        else filePath = "maps/16x16";
+        else filePath = "maps/16x16/";
 
         parseVertexFile(filePath + "nodes.txt", graph);
         parseEdgeFile(filePath + "edges.txt", graph, false);
@@ -354,7 +354,9 @@ MenuType menu::calculateTripMenu(const std::vector<float>& preferences,
 
         std::vector<float> scores = calculateScores(categories, preferences);
 
+        cout << "Start vertex: ";
         unsigned int start = selectVertex(graph);
+        cout << "Finish vertex: ";
         unsigned int finish = selectVertex(graph);
 
         float budget = getBudget();
