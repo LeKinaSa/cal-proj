@@ -235,10 +235,24 @@ void menu::showPathOnGraphViewer(const std::vector<Vertex<PosInfo>*> & path,
 unsigned int menu::selectVertex(const Graph<PosInfo>& graph) {
     std::cout << "Enter a vertex id between 0 and " << graph.getVertexSet().size() - 1 << std::endl;
 
-    std::string answer;
-    getline(std::cin, answer);
+    std::string answerStr;
+    unsigned int answer;
 
-    return stoul(answer);
+    while (true) {
+        std::cout << menu::INPUT;
+        getline(std::cin, answerStr);
+        try {
+            answer = stoul(answerStr);
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Invalid unsigned int." << std::endl;
+            continue;
+        }
+        if ((answer >= 0) && (answer < graph.getVertexSet().size() - 1)) {
+            break;
+        }
+    }
+    return answer;
 }
 
 
@@ -354,9 +368,9 @@ MenuType menu::calculateTripMenu(const std::vector<float>& preferences,
 
         std::vector<float> scores = calculateScores(categories, preferences);
 
-        cout << "Start vertex: ";
+        optionsMenu("Start vertex", {}, menu::NONE);
         unsigned int start = selectVertex(graph);
-        cout << "Finish vertex: ";
+        optionsMenu("Finish vertex", {}, menu::NONE);
         unsigned int finish = selectVertex(graph);
 
         float budget = getBudget();
