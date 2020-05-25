@@ -60,8 +60,10 @@ namespace menu {
     template <class T>
     void showPath(const std::vector<Vertex<T>*> & path);
 
-    void showPathOnGraphViewer(const std::vector<Vertex<char>*> & path);
-    void showPathOnGraphViewer(const std::vector<Vertex<PosInfo>*> & path);
+    void showPathOnGraphViewer(const std::vector<Vertex<char>*> & path,
+            const std::vector<Vertex<char>*>& pointsOfInterest);
+    void showPathOnGraphViewer(const std::vector<Vertex<PosInfo>*>& path,
+            const std::vector<Vertex<PosInfo>*>& pointsOfInterest);
 
     unsigned int selectVertex(const Graph<PosInfo>& graph);
 

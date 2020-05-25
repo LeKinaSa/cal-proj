@@ -2,6 +2,7 @@
 #include "../lib/graphviewer.h"
 
 #include <iostream>
+#include <algorithm>
 
 int menu::optionsMenu(const std::string & title, const std::vector<std::string> & options, OPTION option) {
     if (title != "") {
@@ -163,11 +164,11 @@ MenuType menu::algorithmsMenu(ReductionStepAlgorithm & reductionStepAlgorithm, C
     return MAIN_MENU;
 }
 
-void menu::showPathOnGraphViewer(const std::vector<Vertex<char>*> & path) {
+void menu::showPathOnGraphViewer(const std::vector<Vertex<char>*> & path,
+        const std::vector<Vertex<char>*>& pointsOfInterest) {
     GraphViewer *gv = new GraphViewer(600, 600, true);
     gv->createWindow(600, 600);
-    gv->defineVertexColor("grey");
-    gv->defineEdgeColor("black");
+    gv->defineVertexColor(WHITE);
 
     char c;
 
@@ -176,6 +177,7 @@ void menu::showPathOnGraphViewer(const std::vector<Vertex<char>*> & path) {
 
         gv->addNode(c);
         gv->setVertexLabel(c, std::string(1, c));
+        gv->setVertexColor(c, BLUE);
     }
 
     for (int index = 1; index < path.size(); ++index) {
@@ -185,24 +187,45 @@ void menu::showPathOnGraphViewer(const std::vector<Vertex<char>*> & path) {
         gv->setVertexLabel(c, std::string(1, c));
 
         gv->addEdge(index - 1, path[index - 1]->getInfo(), c, EdgeType::DIRECTED);
+
+        if (index == path.size() - 1) {
+            gv->setVertexColor(c, YELLOW);
+        }
+    }
+
+    for (auto v : path) {
+        if (std::find(pointsOfInterest.begin(), pointsOfInterest.end(), v) != pointsOfInterest.end()) {
+            gv->setVertexColor(v->getInfo(), GRAY);
+        }
     }
 
     gv->rearrange();
 }
 
-void menu::showPathOnGraphViewer(const std::vector<Vertex<PosInfo>*> & path) {
+void menu::showPathOnGraphViewer(const std::vector<Vertex<PosInfo>*> & path,
+        const std::vector<Vertex<PosInfo>*>& pointsOfInterest) {
     GraphViewer *gv = new GraphViewer(600, 600, false);
     gv->createWindow(600, 600);
-    gv->defineVertexColor("grey");
-    gv->defineEdgeColor("black");
+    gv->defineVertexColor(WHITE);
 
     if (!path.empty()) {
         gv->addNode(path[0]->getInfo().getId(), path[0]->getInfo().getX(), path[0]->getInfo().getY());
+        gv->setVertexColor(path[0]->getInfo().getId(), BLUE);
     }
 
     for (int index = 1; index < path.size(); ++ index) {
         gv->addNode(path[index]->getInfo().getId(), path[index]->getInfo().getX(), path[index]->getInfo().getY());
         gv->addEdge(index - 1, path[index - 1]->getInfo().getId(), path[index]->getInfo().getId(), EdgeType::DIRECTED);
+
+        if (index == path.size() - 1) {
+            gv->setVertexColor(path[index]->getInfo().getId(), YELLOW);
+        }
+    }
+
+    for (auto v : path) {
+        if (std::find(pointsOfInterest.begin(), pointsOfInterest.end(), v) != pointsOfInterest.end()) {
+            gv->setVertexColor(v->getInfo().getId(), GRAY);
+        }
     }
 
     gv->rearrange();
@@ -286,9 +309,9 @@ void initReportGraph(Graph<char>& graph, std::vector<Vertex<char>*>& pointsOfInt
     graph.addEdge('s', 'd', 3.0);
 
     pointsOfInterest.push_back(graph.findVertex('b'));
-    pointsOfInterest.push_back(graph.findVertex('h'));
     pointsOfInterest.push_back(graph.findVertex('i'));
     pointsOfInterest.push_back(graph.findVertex('j'));
+    pointsOfInterest.push_back(graph.findVertex('h'));
 
     scores.push_back(1.0);
     scores.push_back(3.0);
@@ -312,7 +335,7 @@ MenuType menu::calculateTripMenu(const std::vector<float>& preferences,
 
         showPath(path);
 
-        // showPathOnGraphViewer(path);
+        showPathOnGraphViewer(path, pointsOfInterest);
     }
     else {
         Graph<PosInfo> graph;
@@ -341,7 +364,7 @@ MenuType menu::calculateTripMenu(const std::vector<float>& preferences,
 
         showPath(path);
 
-        // showPathOnGraphViewer(path);
+        showPathOnGraphViewer(path, pointsOfInterest);
     }
 
     optionsMenu("", {}, BACK);
