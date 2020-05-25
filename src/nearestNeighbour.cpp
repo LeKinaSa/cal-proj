@@ -1,9 +1,6 @@
-//
-// Created by daniel on 17/05/2020.
-//
-
 #include <iostream>
 #include "nearestNeighbour.h"
+
 using namespace std;
 
 std::vector<int>
@@ -70,6 +67,8 @@ nearestNeighbour(const std::vector<std::vector<float>> &adjMatrix, const std::ve
             unusedVertices.erase(unusedVertices.begin() + bestUnusedPathIndex);
         }
     }
+
+    cout << "Path score: " << score << " | Path cost: " << pathCost << endl;
 
     return path;
 }
