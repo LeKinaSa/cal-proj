@@ -9,4 +9,5 @@ include_directories(lib)
 # link_libraries(ws2_32 wsock32)
 
 add_executable(cal_proj src/main.cpp src/branchAndBound.cpp src/nearestNeighbour.cpp src/parsing.cpp
-        src/PosInfo.cpp src/mockMatrices.cpp src/CCTSPbenchmark.cpp src/menu.cpp lib/graphviewer.cpp lib/connection.cpp)
+        src/PosInfo.cpp src/mockMatrices.cpp src/CCTSPbenchmark.cpp src/menu.cpp lib/graphviewer.cpp
+        lib/connection.cpp src/randomGraphs.cpp)

@@ -20,6 +20,7 @@ public:
     const T& getInfo() const;
     float getDist() const;
     Vertex<T>* getPath() const;
+    const std::vector<Edge<T>>& getAdj() const;
 
     void addEdge(Vertex<T>* dest, float weight);
 
@@ -62,9 +63,16 @@ Vertex<T>* Vertex<T>::getPath() const {
 }
 
 template<class T>
+const vector<Edge<T>> &Vertex<T>::getAdj() const {
+    return adj;
+}
+
+
+template<class T>
 void Vertex<T>::addEdge(Vertex<T>* dest, float weight) {
     adj.push_back(Edge<T>(dest, weight));
 }
+
 
 template <class T>
 bool Vertex<T>::isPOI(const std::vector<Vertex<T>*>& pointsOfInterest) {
@@ -75,6 +83,7 @@ bool Vertex<T>::isPOI(const std::vector<Vertex<T>*>& pointsOfInterest) {
     }
     return false;
 }
+
 
 template<class T>
 bool Vertex<T>::operator<(const Vertex<T>& vertex) const {
@@ -87,6 +96,9 @@ template<class T>
 class Edge {
 public:
     Edge(Vertex<T>* dest, float weight);
+
+    const Vertex<T>* getDest() const;
+
     friend class Vertex<T>;
     friend class Graph<T>;
 private:
@@ -96,6 +108,9 @@ private:
 
 template<class T>
 Edge<T>::Edge(Vertex<T>* dest, float weight) : dest(dest), weight(weight) {}
+
+template<class T>
+const Vertex<T>* Edge<T>::getDest() const { return dest; }
 
 
 /**
